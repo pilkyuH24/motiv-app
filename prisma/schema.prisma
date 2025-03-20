@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//
+// =============== Enums ===============
+//
+enum Status {
+  ONGOING
+  COMPLETED
+  FAILED
+}
+
+// 반복 주기 타입 예시 (필요에 따라 CUSTOM 추가)
+enum MissionRepeatType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  CUSTOM
+}
+
+//
+// =============== Models ===============
+//
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  points    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt 
+
+  userMissions      UserMission[]
+  badges            UserBadge[]
+  settings          UserSetting?
+  pointTransactions PointTransaction[] // 포인트 변동 로그와 연결
+}
+
+model Mission {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String?
+  rewardPoints Int      @default(0) // 미션 완료 시 제공할 포인트
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt 
+
+  UserMission UserMission[]
+}
+
+model UserMission {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  missionId Int
+  mission   Mission @relation(fields: [missionId], references: [id])
+
+  status    Status    @default(ONGOING)
+  startDate DateTime  @default(now())
+  endDate   DateTime? //
+  updatedAt DateTime  @updatedAt 
+
+  // 반복 주기 필드
+  repeatType MissionRepeatType @default(DAILY)
+  // 일(0)~토(6)
+  repeatDays Boolean[] @default([false, false, false, false, false, false, false])
+
+  // 로그(진행 기록)와 연결
+  logs UserMissionLog[]
+
+  // 같은 유저가 동일 미션 중복 선택 불가
+  @@unique([userId, missionId])
+}
+
+//
+// =============== 새로 추가된 Log 테이블 ===============
+//
+model UserMissionLog {
+  id            Int         @id @default(autoincrement())
+  userMission   UserMission @relation(fields: [userMissionId], references: [id])
+  userMissionId Int
+
+  date      DateTime // 예: 2025-03-06 (UTC 0시) 등
+  isDone    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // "같은 userMission + 같은 date" 중복 생성 방지
+  @@unique([userMissionId, date])
+}
+
+//
+// =============== Badge / UserBadge ===============
+//
+model Badge {
+  id          Int      @id @default(autoincrement())
+  title       String   @unique
+  description String?
+  condition   String // ex: "한 달간 금연", 실제 로직은 코드에서 판단
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt 
+
+  userBadges UserBadge[]
+}
+
+model UserBadge {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  badgeId   Int
+  awardedAt DateTime @default(now())
+
+  @@unique([userId, badgeId]) // 같은 뱃지 중복 획득 불가
+}
+
+//
+// =============== 유저 설정(기존 그대로) ===============
+//
+model UserSetting {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+  settings  Json     @default("{}") // JSON 형식으로 저장
+  updatedAt DateTime @updatedAt
+}
+
+//
+// =============== 새로 추가된 포인트 트랜잭션 테이블 ===============
+//
+model PointTransaction {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  change    Int // +10, -5 등 포인트 증감량
+  reason    String // ex: 'MISSION_COMPLETE', 'BADGE_AWARD', 'ADMIN_ADJUST'
+  createdAt DateTime @default(now())
+  // 필요에 따라 updatedAt @updatedAt 추가 가능
+
+  // 조회 패턴에 따라 인덱스 추가 고려
+  // @@index([userId, createdAt])
+}

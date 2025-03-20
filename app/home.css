@@ -1,0 +1,30 @@
+@keyframes colorAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .animated-text {
+    background: linear-gradient(to right, #f8b195, #f67280, #c06c84);
+    background-size: 400% 400%;
+    animation: colorAnimation 5s ease infinite;
+    
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+  }
+
+  .animated-navbar {
+    background: linear-gradient(to right, #f8b195, #f67280, #c06c84);
+    background-size: 400% 400%;
+    animation: colorAnimation 5s ease infinite;
+  }
+
+  .animated-footer {
+    background: linear-gradient(to right, #f8b195, #f67280, #c06c84);
+    background-size: 400% 400%;
+    animation: colorAnimation 5s ease infinite;
+  }
+  
+  
+  

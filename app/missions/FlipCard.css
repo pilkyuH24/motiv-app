@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+.flip-card {
+  background-color: transparent;
+  width: 100%;
+  height: 200px;
+  perspective: 1000px; /* Adds depth effect for the 3D flip */
+  font-family: sans-serif;
+  font-size: x-large;
+}
+
+/* Animation for background color transition */
+@keyframes colorAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.5s; /* Smooth transition for flip effect */
+  transform-style: preserve-3d; /* Ensures proper 3D rendering */
+}
+
+/* Flip effect when hovered */
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.2); /* Adds a soft shadow */
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden; /* Hides the back side when not visible */
+  border-radius: 1rem;
+  padding: 3rem;
+}
+
+/* Front side of the card with a semi-transparent effect */
+.flip-card-front {
+  @apply bg-gray-500/30 backdrop-blur-lg border border-gray-500/40 rounded-lg;
+  /* animation: colorAnimation 5s ease infinite; */
+  color: black;
+  border: 1px solid #ffffff;
+}
+
+/* Back side of the card with a dynamic gradient animation */
+.flip-card-back {
+  background: linear-gradient(270deg, #ce68d9, #45c6db, #45db79);
+  background-size: 400% 400%;
+  animation: colorAnimation 5s ease infinite;
+  color: white;
+  transform: rotateY(180deg); /* Ensures back side is flipped correctly */
+}
+
+/* Scrollable container for horizontal card scrolling */
+.overflow-x-auto {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #6a5acd transparent;
+  padding-bottom: 10px;
+}
+
+/* "Challenge" button styling */
+.challenge-button {
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #ffffff;
+  transition: all 0.5s ease;
+  font-size: large;
+  position: relative;
+  overflow: hidden;
+  outline: 2px solid #de9ebd;
+  background-color: #fab3d5;
+  box-shadow: 3px 4px 10px -4px #604652;
+  margin-top: 10px;
+}
+
+/* Hover effect: enlarges the button slightly and changes outline */
+.challenge-button:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+  outline: 2px solid #d84339;
+  box-shadow: 4px 5px 17px -4px #a1342c;
+}
+
+/* Creates a dynamic background effect when hovered */
+.challenge-button::before {
+  content: "";
+  position: absolute;
+  left: -50px;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background-color: #f34d41;
+  transform: skewX(45deg); /* Slanted effect for animation */
+  z-index: -1;
+  transition: width 0.5s ease;
+}
+
+/* Expands background effect when hovered */
+.challenge-button:hover::before {
+  width: 250%;
+}
