@@ -5,7 +5,7 @@ import { authOptions } from "../auth/[...nextauth]/route";
 import { addDays, addWeeks, addMonths, isBefore } from "date-fns";
 
 // Handles GET requests to retrieve all user missions
-export async function GET(req: Request) {
+export async function GET() {
   console.log("[user-missions] API called...");
 
   const session = await getServerSession(authOptions);

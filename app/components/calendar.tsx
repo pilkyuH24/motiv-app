@@ -10,87 +10,69 @@ import {
   isToday,
   parseISO,
   isFuture,
+  isBefore,
+  isEqual,
 } from "date-fns";
 
-// Represents a mission log entry for a specific date
 interface Log {
-  date: string; // Date of the log (format: YYYY-MM-DD)
-  isDone: boolean; // Indicates whether the mission was completed
-  missionTitle: string; // Title of the mission
+  date: string;
+  isDone: boolean;
+  missionTitle: string;
 }
 
-// Represents a mission assigned to a user
 interface UserMission {
-  id: number; // Unique mission identifier
-  missionTitle: string; // Mission title
-  startDate: string; // Start date in ISO format
-  endDate: string; // End date in ISO format
-  repeatType: "DAILY" | "WEEKLY" | "MONTHLY" | "CUSTOM"; // Type of repetition
-  repeatDays?: boolean[]; // Array indicating active days (only for CUSTOM)
+  id: number;
+  missionTitle: string;
+  startDate: string;
+  endDate: string;
+  repeatType: "DAILY" | "WEEKLY" | "MONTHLY" | "CUSTOM";
+  repeatDays?: boolean[];
 }
 
-// Props passed to the Calendar component
 interface CalendarProps {
-  logs: Log[]; // Array of mission completion logs
-  userMissions: UserMission[]; // Array of active user missions
+  logs: Log[];
+  userMissions: UserMission[];
 }
 
 export default function Calendar({ logs, userMissions }: CalendarProps) {
-  // Stores the currently displayed month
   const [currentDate, setCurrentDate] = useState(new Date());
-
-  // Stores the date selected by the user
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
-  // Stores logs for the selected date
   const [modalLogs, setModalLogs] = useState<Log[]>([]);
-
-  // Stores future mission logs for upcoming days
   const [futureMissions, setFutureMissions] = useState<Log[]>([]);
 
-  // Calculate the first and last days of the current month
   const firstDayOfMonth = startOfMonth(currentDate);
   const lastDayOfMonth = endOfMonth(currentDate);
-
-  // Generate an array of all days in the current month
   const days = eachDayOfInterval({
     start: firstDayOfMonth,
     end: lastDayOfMonth,
   });
 
-  // Labels for the days of the week (Sunday to Saturday)
   const dayLabels = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-
-  // Determine how many empty slots are needed before the first day of the month
   const paddingStart = getDay(firstDayOfMonth);
 
-  // Today's date, reset to midnight (UTC)
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
-  /**
-   * Fetches missions scheduled for future dates and pre-fills them in the calendar.
-   * This effect runs when the `userMissions` array changes.
-   */
+  //  Get missions for future dates
   useEffect(() => {
     const upcomingMissions = userMissions.flatMap((mission) => {
       const missionStart = parseISO(mission.startDate);
       const missionEnd = mission.endDate ? parseISO(mission.endDate) : null;
 
-      return isFuture(missionStart) // Process only future missions
+      return isFuture(missionStart)
         ? Array.from(
             {
               length: Math.ceil(
                 (missionEnd
                   ? missionEnd.getTime() - missionStart.getTime()
                   : 7 * 86400000) / 86400000
-              ), // Calculate the number of days between mission start and end
+              ),
             },
             (_, i) => ({
               date: format(
                 new Date(missionStart.getTime() + i * 86400000),
                 "yyyy-MM-dd"
-              ), // Convert each day to a formatted string
+              ),
               isDone: false,
               missionTitle: mission.missionTitle,
             })
@@ -101,20 +83,14 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
     setFutureMissions(upcomingMissions);
   }, [userMissions]);
 
-  /**
-   * Handles user clicking on a specific date.
-   * It filters logs and displays them in the modal.
-   */
+  //  Filter logs when a date is clicked
   const handleDateClick = (day: Date) => {
     const dateStr = format(day, "yyyy-MM-dd");
-
-    // Find logs for the selected date
     const dayLogs = logs.filter(
       (log) => format(parseISO(log.date), "yyyy-MM-dd") === dateStr
     );
 
     if (isFuture(day)) {
-      // If the selected date is in the future, check for scheduled missions
       const futureLogsForDay = futureMissions.filter(
         (log) => log.date === dateStr
       );
@@ -128,12 +104,11 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
 
   return (
     <div className="flex flex-col items-center min-h-screen">
-      {/* Display the current month and year */}
       <h1 className="text-3xl font-extrabold text-gray-800 mb-4">
         {format(currentDate, "yyyy MMMM")}
       </h1>
 
-      {/* Navigation buttons for changing months */}
+      {/*  Month change buttons */}
       <div className="flex justify-between w-full max-w-2xl mb-4">
         <button
           className="w-8 h-8 bg-black hover:bg-gray-600 transition"
@@ -160,42 +135,46 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
       </div>
 
       <ul className="grid grid-cols-7 gap-2 list-none text-center">
-        {/* Render weekday labels */}
         {dayLabels.map((day) => (
           <li key={day} className="font-medium text-gray-800 text-lg">
             {day}
           </li>
         ))}
-        {/* Render empty spaces for previous month's days */}
         {Array.from({ length: paddingStart }).map((_, i) => (
           <li key={`empty-${i}`} className=""></li>
         ))}
 
-        {/* Render all days in the current month */}
         {days.map((day) => {
           const dateStr = format(day, "yyyy-MM-dd");
-          const isFutureDay = isFuture(day);
 
-          // Determine background color based on mission completion
-          let bgColor = "bg-white/25";
+          //  Optimize search speed by converting logs to Map
+          const logMap = new Map<string, Log[]>();
+          logs.forEach((log: Log) => {
+            const logDateStr = format(parseISO(log.date), "yyyy-MM-dd");
+            if (!logMap.has(logDateStr)) logMap.set(logDateStr, []);
+            logMap.get(logDateStr)!.push(log);
+          });
 
-          // Find all logs for the current date
-          const dayLogs = logs.filter(
-            (log) => format(parseISO(log.date), "yyyy-MM-dd") === dateStr
-          );
+          //  Get logs for the specific date
+          const dayLogs = logMap.get(dateStr) || [];
 
+          //  Check completion status
           const completedCount = dayLogs.filter((log) => log.isDone).length;
           const failedCount = dayLogs.filter((log) => !log.isDone).length;
           const totalCount = dayLogs.length;
+          const isFutureDay = isFuture(day);
+
+          //  Default background color setting
+          let bgColor = "bg-white/25"; // Default (no records)
 
           if (isFutureDay && totalCount > 0) {
-            bgColor = "bg-gray-300";
+            bgColor = "bg-gray-300"; //  Gray only if future date with logs
           } else if (totalCount === completedCount && completedCount > 0) {
-            bgColor = "bg-blue-500";
+            bgColor = "bg-blue-500"; //  All completed (blue)
           } else if (completedCount > 0 && failedCount > 0) {
-            bgColor = "bg-orange-500";
+            bgColor = "bg-orange-500"; // ⚠ Partial completion (orange)
           } else if (failedCount === totalCount && totalCount > 0) {
-            bgColor = "bg-red-500";
+            bgColor = "bg-red-500"; //  All incomplete (red)
           }
 
           return (
@@ -211,6 +190,80 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
           );
         })}
       </ul>
+
+      {/*  Modal (displayed when a date is clicked) */}
+      {selectedDate && (
+        <div className="fixed inset-0 flex items-center justify-center rounded-lg bg-black/50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">
+              {format(selectedDate, "yyyy년 MM월 dd일")} Mission Status
+            </h2>
+
+            {modalLogs.length > 0 ? (
+              <ul className="space-y-2">
+                {modalLogs.map((log, index) => (
+                  <li key={index} className="flex justify-between text-lg">
+                    <span>{log.missionTitle}</span>
+                    <span>{log.isDone ? "✅ Completed" : "❌ Incomplete"}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <ul className="space-y-2">
+                {/*  Display only if future date && repeating mission on this weekday exists */}
+                {isFuture(selectedDate)
+                  ? userMissions
+                      .filter((mission) => {
+                        const start = parseISO(mission.startDate);
+                        const end = mission.endDate
+                          ? parseISO(mission.endDate)
+                          : null;
+                        const dayIndex = selectedDate.getUTCDay(); //  Get weekday index
+                        const daysDifference = Math.floor(
+                          (selectedDate.getTime() - start.getTime()) /
+                            (1000 * 60 * 60 * 24)
+                        ); //  Calculate days difference from start date
+                        
+                        // rest of logic as-is...
+
+                        return (
+                          isBefore(start, selectedDate!) &&
+                          (!end ||
+                            isBefore(selectedDate!, end) ||
+                            isEqual(selectedDate!, end)) &&
+                          //  CUSTOM (check weekday)
+                          ((mission.repeatType === "CUSTOM" &&
+                            mission.repeatDays?.[dayIndex]) ||
+                            //  WEEKLY (check 7-day interval)
+                            (mission.repeatType === "WEEKLY" &&
+                              daysDifference % 7 === 0) ||
+                            //  MONTHLY (check same day of month)
+                            (mission.repeatType === "MONTHLY" &&
+                              selectedDate.getDate() === start.getDate()))
+                        );
+                      })
+                      .map((mission, index) => (
+                        <li
+                          key={index}
+                          className="flex justify-between text-lg"
+                        >
+                          <span>{mission.missionTitle}</span>
+                          <span>➖</span>
+                        </li>
+                      ))
+                  : "No missions recorded."}
+              </ul>
+            )}
+
+            <button
+              className="mt-4 px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition w-full"
+              onClick={() => setSelectedDate(null)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

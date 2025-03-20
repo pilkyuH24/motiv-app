@@ -17,7 +17,7 @@ const scrollToSection = (id: string) => {
 };
 
 export default function Home() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
   if (status === "authenticated") {
     redirect("/dashboard");
