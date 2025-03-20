@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
-import { LoginButton, LogoutButton } from "./auth";
+import { LoginButton } from "./auth";
 import { useSession } from "next-auth/react";
 import "./auth.css";
 

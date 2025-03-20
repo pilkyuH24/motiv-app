@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         // Handles user sign-in: Creates or updates the user record in the database
-        async signIn({ account, profile }) {
+        async signIn({ profile }) {
             if (!profile?.email) {
                 throw new Error('No profile') // Error if the profile does not contain an email
             }
@@ -36,7 +36,7 @@ export const authOptions: NextAuthOptions = {
         },
 
         // 🚀 Includes additional information in the session
-        async session({ session, token }) {
+        async session({ session }) {
             if (!session.user?.email) return session; // If no user email, return session as is
 
             // Fetch user data from Prisma, including badges

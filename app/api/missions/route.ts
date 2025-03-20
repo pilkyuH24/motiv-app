@@ -8,6 +8,7 @@ export async function GET() {
     const missions = await prisma.mission.findMany();
     return NextResponse.json(missions, { status: 200 });
   } catch (error) {
+    console.error("Error fetching missions:", error); 
     // Return a 500 response in case of an error
     return NextResponse.json({ error: "Failed to fetch missions" }, { status: 500 });
   }

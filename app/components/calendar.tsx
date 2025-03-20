@@ -10,8 +10,6 @@ import {
   isToday,
   parseISO,
   isFuture,
-  isBefore,
-  isEqual,
 } from "date-fns";
 
 // Represents a mission log entry for a specific date

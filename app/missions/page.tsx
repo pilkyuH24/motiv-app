@@ -191,7 +191,7 @@ export default function MissionsPage() {
                   className={`m-1 px-3 py-1 rounded-md ${
                     repeatType === type ? "bg-blue-500 text-white" : "bg-white"
                   }`}
-                  onClick={() => setRepeatType(type as any)}
+                  onClick={() => setRepeatType(type as "DAILY" | "WEEKLY" | "MONTHLY" | "CUSTOM")}
                 >
                   {type}
                 </button>
