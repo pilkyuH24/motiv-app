@@ -69,5 +69,7 @@ The **Motivation App** is a web-based mission management system designed to help
 - Consider developing a **mobile app version**.
 
 ---
+[Visit](https://motiv-app-pilkyuhs-projects-6ac5df7c.vercel.app/) ✅
 
-
+![Alt text](/public/missions.png)
+![Alt text](/public/dashboard.png)
