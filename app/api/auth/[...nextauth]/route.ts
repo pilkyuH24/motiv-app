@@ -1,62 +1,59 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 // import CredentialsProvider from 'next-auth/providers/credentials' // For email-based login (password not implemented)
+import { prisma } from '@/lib/prisma';
 
-import { prisma } from "@/lib/prisma";
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 
-// Google OAuth client ID and secret from environment variables
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!
+// Removed the export keyword here ( export const authOptions)
+const authOptions: NextAuthOptions = {
+  session: {
+    strategy: 'jwt',
+  },
+  providers: [
+    GoogleProvider({
+      clientId: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+    }),
+  ],
+  callbacks: {
+    async signIn({ profile }) {
+      if (!profile?.email) {
+        throw new Error('No profile');
+      }
 
-export const authOptions: NextAuthOptions = {
-    session: {
-        strategy: 'jwt' // Using JWT for session management
+      await prisma.user.upsert({
+        where: { email: profile.email },
+        create: { email: profile.email, name: profile.name ?? 'USER', points: 0 },
+        update: { name: profile.name },
+      });
+
+      return true;
     },
-    providers: [
-        GoogleProvider({
-            clientId: GOOGLE_CLIENT_ID, // Google OAuth client ID
-            clientSecret: GOOGLE_CLIENT_SECRET // Google OAuth client secret
-        })
-    ],
-    callbacks: {
-        // Handles user sign-in: Creates or updates the user record in the database
-        async signIn({ profile }) {
-            if (!profile?.email) {
-                throw new Error('No profile') // Error if the profile does not contain an email
-            }
 
-            // Using Prisma to upsert the user into the database (create if not exists, update if exists)
-            await prisma.user.upsert({
-                where: { email: profile.email },
-                create: { email: profile.email, name: profile.name ?? "USER", points: 0 }, // Default to 'USER' name if profile has no name
-                update: { name: profile.name }
-            })
+    async session({ session }) {
+      if (!session.user?.email) return session;
 
-            return true
-        },
+      const user = await prisma.user.findUnique({
+        where: { email: session.user.email },
+        include: { badges: true },
+      });
 
-        // 🚀 Includes additional information in the session
-        async session({ session }) {
-            if (!session.user?.email) return session; // If no user email, return session as is
+      if (user) {
+        session.user.points = user.points;
+      }
 
-            // Fetch user data from Prisma, including badges
-            const user = await prisma.user.findUnique({
-                where: { email: session.user.email },
-                include: { badges: true }  // Include badges data
-            });
+      return session;
+    },
+  },
+};
 
-            if (user) {
-                session.user.points = user.points; // Add user points to the session
-                // session.user.badges = user.badges.map(badge => badge.name); // Optionally add badge names to the session
-            }
+const handler = NextAuth(authOptions);
 
-            return session; // Return updated session
-        }
-    }
-}
+// Export handler only
+export { handler as GET, handler as POST };
 
-const handler = NextAuth(authOptions)
-export { handler as GET, handler as POST }
 
 
 // ===========================================================================
