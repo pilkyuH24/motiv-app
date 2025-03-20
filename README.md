@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Motivation App
 
-## Getting Started
+## 1. Description
 
-First, run the development server:
+The **Motivation App** is a web-based mission management system designed to help users set and track their personal goals, such as quitting smoking, exercising, sleeping early, and other self-improvement activities. Users can choose missions, log their progress, and earn rewards and badges based on their achievements. The app provides an intuitive interface with a calendar view, real-time mission updates, and personalized settings.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 2. Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### User Authentication
+- Users can log in using **Google OAuth** (NextAuth integration).
+- Secure session management using JWT tokens.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Mission Management
+- Users can browse a **list of predefined missions** (e.g., "Exercise Daily," "Read Books").
+- Users can select missions and specify **start date, end date, and repetition type**:
+  - **Daily**: Repeat every day.
+  - **Weekly**: Repeat once per week.
+  - **Monthly**: Repeat once per month.
+  - **Custom**: Users can select specific days of the week.
 
-## Learn More
+### Mission Progress Tracking
+- Users can **mark missions as completed** each day.
+- A **calendar view** visually displays mission completion status.
+- Mission logs are stored in a **PostgreSQL database** for historical tracking.
 
-To learn more about Next.js, take a look at the following resources:
+### Reward System
+- Completing missions grants **reward points**.
+- Points can be accumulated for **future rewards or achievements**.
+- Users can earn **badges** based on their performance (e.g., "30-Day Streak").
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Dashboard & Data Visualization
+- Users have a **dashboard** to manage their active missions.
+- The dashboard provides **a list of ongoing and past missions**.
+- Logs of completed missions are stored and visualized.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Settings & Personalization
+- Users can **customize their preferences** in a settings page.
+- Stored in JSON format for **flexible configurations**.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 3. Planned Improvements
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1. **Optimize Loading Speed**
+- Reduce initial API request time.
+- Improve database indexing for faster queries.
+- Implement caching mechanisms.
+
+### 2. **Enhance Mission Completion Handling**
+- Introduce an **undo feature** for mistakenly marked missions.
+- Improve the mission completion **UI and confirmation messages**.
+
+### 3. **Expand Badge System**
+- Add more badges with **different difficulty levels**.
+- Implement a **badge progress tracking system**.
+
+### 4. **Introduce Notifications**
+- **Reminders for upcoming missions** via push notifications or emails.
+- Alerts for **streaks and achievements**.
+
+### 5. **Improve Data Visualization**
+- Display **progress charts** in the dashboard.
+- Add **weekly and monthly reports**.
+
+### 6. **Mobile Compatibility**
+- Improve **responsive design** for seamless mobile usage.
+- Consider developing a **mobile app version**.
+
+---
+
+
