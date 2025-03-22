@@ -42,16 +42,14 @@
   height: 100%;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden; /* Hides the back side when not visible */
-  border-radius: 1rem;
   padding: 3rem;
 }
 
 /* Front side of the card with a semi-transparent effect */
 .flip-card-front {
-  @apply bg-gray-500/30 backdrop-blur-lg border border-gray-500/40 rounded-lg;
-  /* animation: colorAnimation 5s ease infinite; */
-  color: black;
-  border: 1px solid #ffffff;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(145deg, transparent 15%,#ffc5dd, #40c9ff) border-box;
+  border: 4px solid transparent;
 }
 
 /* Back side of the card with a dynamic gradient animation */
@@ -82,21 +80,21 @@
   letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
-  color: #ffffff;
+  color: #fa6975;
   transition: all 0.5s ease;
   font-size: large;
   position: relative;
   overflow: hidden;
-  outline: 2px solid #de9ebd;
-  background-color: #fab3d5;
-  box-shadow: 3px 4px 10px -4px #604652;
+  outline: 2px solid #f98691;           
+  background-color: rgb(255, 255, 255);            
+  box-shadow: 3px 4px 10px -4px #892c35;
   margin-top: 10px;
 }
 
 /* Hover effect: enlarges the button slightly and changes outline */
 .challenge-button:hover {
   color: #ffffff;
-  transform: scale(1.1);
+  transform: scale(1.2);
   outline: 2px solid #d84339;
   box-shadow: 4px 5px 17px -4px #a1342c;
 }
@@ -109,7 +107,7 @@
   top: 0;
   width: 0;
   height: 100%;
-  background-color: #f34d41;
+  background-color: #f93030;
   transform: skewX(45deg); /* Slanted effect for animation */
   z-index: -1;
   transition: width 0.5s ease;

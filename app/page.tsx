@@ -6,6 +6,7 @@ import { LoginButton } from "./components/auth";
 import "./home.css";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 const sections = [
   { id: "section1", title: "Select Your Missions" },
@@ -68,87 +69,88 @@ export default function Home() {
 
         {/* Glassmorphism Grid Section */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6 px-20 py-12 bg-gradient-to-br from-[#fbd4c5] to-[#a2d2ff] text-gray-700 text-2xl">
-  {/* Section 1: Mission Selection */}
-  <div
-    id="section1"
-    className="h-120 bg-white/30 backdrop-blur-lg shadow-lg rounded-xl flex flex-col items-center justify-center text-2xl font-semibold border border-white/40 p-6 opacity-90"
-  >
-    <p className="mb-4 text-center">
-      <span className="underline decoration-[#f78ca0] decoration-4">
-        Choose multiple missions
-      </span>
-      <br />
-      Customize your challenge by setting specific dates and repeating schedules.
-    </p>
-    <ul className="text-lg opacity-80 list-disc text-left pl-6">
-      <li>Set daily, weekly, or custom schedules.</li>
-      <li>Track mission progress easily.</li>
-      <li>Stay committed with reminders.</li>
-    </ul>
-  </div>
+          {/* Section 1: Mission Selection */}
+          <div
+            id="section1"
+            className="h-120 bg-white/30 backdrop-blur-lg shadow-lg rounded-xl flex flex-col items-center justify-center text-2xl font-semibold border border-white/40 p-6 opacity-90"
+          >
+            <p className="mb-4 text-center">
+              <span className="underline decoration-[#f78ca0] decoration-4">
+                Choose multiple missions
+              </span>
+              <br />
+              Customize your challenge by setting specific dates and repeating
+              schedules.
+            </p>
+            <ul className="text-lg opacity-80 list-disc text-left pl-6">
+              <li>Set daily, weekly, or custom schedules.</li>
+              <li>Track mission progress easily.</li>
+              <li>Stay committed with reminders.</li>
+            </ul>
+          </div>
 
-  {/* Section 2: Mission Recommendations */}
-  <div
-    id="section2"
-    className="h-120 bg-white/30 backdrop-blur-lg shadow-lg rounded-xl flex flex-col items-center justify-center text-2xl font-semibold border border-white/40 p-6 opacity-90"
-  >
-    <p className="mb-4 text-center">
-      <span className="underline decoration-[#ffafcc] decoration-4">
-        Personalized Mission Suggestions
-      </span>
-      <br />
-      Based on your preferences and past performance.
-    </p>
-    <ul className="text-lg opacity-80 list-disc text-left pl-6">
-      <li>AI-driven recommendations for better results.</li>
-      <li>Suggestions based on your selected categories.</li>
-      <li>Stay motivated with fresh challenges.</li>
-    </ul>
-  </div>
+          {/* Section 2: Mission Recommendations */}
+          <div
+            id="section2"
+            className="h-120 bg-white/30 backdrop-blur-lg shadow-lg rounded-xl flex flex-col items-center justify-center text-2xl font-semibold border border-white/40 p-6 opacity-90"
+          >
+            <p className="mb-4 text-center">
+              <span className="underline decoration-[#ffafcc] decoration-4">
+                Personalized Mission Suggestions
+              </span>
+              <br />
+              Based on your preferences and past performance.
+            </p>
+            <ul className="text-lg opacity-80 list-disc text-left pl-6">
+              <li>AI-driven recommendations for better results.</li>
+              <li>Suggestions based on your selected categories.</li>
+              <li>Stay motivated with fresh challenges.</li>
+            </ul>
+          </div>
 
-  {/* Section 3: Mission Calendar */}
-  <div
-    id="section3"
-    className="h-120 bg-white/30 backdrop-blur-lg shadow-lg rounded-xl flex flex-col items-center justify-center text-2xl font-semibold border border-white/40 p-6 opacity-90"
-  >
-    <p className="mb-4 text-center">
-      <span className="underline decoration-[#9d76c1] decoration-4">
-        Track Your Progress
-      </span>
-      <br />
-      View your mission success summary on an interactive calendar.
-    </p>
-    <ul className="text-lg opacity-80 list-disc text-left pl-6">
-      <li>Check your completed missions at a glance.</li>
-      <li>Identify trends in your mission streaks.</li>
-      <li>Celebrate your consistency and achievements.</li>
-    </ul>
-  </div>
+          {/* Section 3: Mission Calendar */}
+          <div
+            id="section3"
+            className="h-120 bg-white/30 backdrop-blur-lg shadow-lg rounded-xl flex flex-col items-center justify-center text-2xl font-semibold border border-white/40 p-6 opacity-90"
+          >
+            <p className="mb-4 text-center">
+              <span className="underline decoration-[#9d76c1] decoration-4">
+                Track Your Progress
+              </span>
+              <br />
+              View your mission success summary on an interactive calendar.
+            </p>
+            <ul className="text-lg opacity-80 list-disc text-left pl-6">
+              <li>Check your completed missions at a glance.</li>
+              <li>Identify trends in your mission streaks.</li>
+              <li>Celebrate your consistency and achievements.</li>
+            </ul>
+          </div>
 
-  {/* Section 4: Achievements and Rewards */}
-  <div
-    id="section4"
-    className="h-120 bg-white/30 backdrop-blur-lg shadow-lg rounded-xl flex flex-col items-center justify-center text-2xl font-semibold border border-white/40 p-6 opacity-90"
-  >
-    <p className="mb-4 text-center">
-      <span className="underline decoration-[#ffcb77] decoration-4">
-        Earn Badges & Rewards
-      </span>
-      <br />
-      Get recognized for your dedication and hard work.
-    </p>
-    <ul className="text-lg opacity-80 list-disc text-left pl-6">
-      <li>Unlock achievements as you complete missions.</li>
-      <li>Gain points and exchange them for exclusive rewards.</li>
-      <li>Stay inspired with milestone-based incentives.</li>
-    </ul>
-  </div>
-</section>
-
+          {/* Section 4: Achievements and Rewards */}
+          <div
+            id="section4"
+            className="h-120 bg-white/30 backdrop-blur-lg shadow-lg rounded-xl flex flex-col items-center justify-center text-2xl font-semibold border border-white/40 p-6 opacity-90"
+          >
+            <p className="mb-4 text-center">
+              <span className="underline decoration-[#ffcb77] decoration-4">
+                Earn Badges & Rewards
+              </span>
+              <br />
+              Get recognized for your dedication and hard work.
+            </p>
+            <ul className="text-lg opacity-80 list-disc text-left pl-6">
+              <li>Unlock achievements as you complete missions.</li>
+              <li>Gain points and exchange them for exclusive rewards.</li>
+              <li>Stay inspired with milestone-based incentives.</li>
+            </ul>
+          </div>
+        </section>
 
         {/* Footer */}
-        <footer className=".animated-footer w-full bg-[#a2d2ff] text-white backdrop-blur-lg text-base py-2 px-15 mt-auto">
-          Pilkyu Han
+        <footer className=".animated-footer w-full bg-[#a2d2ff] text-white backdrop-blur-lg text-base py-2 px-15 mt-auto flex justify-end">
+        <Link href="https://github.com/pilkyuH24/motiv-app" className="underline" >Github link</Link>
+          <div className="ml-4">@Pilkyu Han </div>    
         </footer>
       </div>
     </main>

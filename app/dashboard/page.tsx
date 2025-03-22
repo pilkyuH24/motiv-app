@@ -92,7 +92,15 @@ export default function Dashboard() {
     startDate: mission.startDate,
     endDate: mission.endDate,
     repeatType: mission.repeatType,
-    repeatDays: mission.repeatDays || [false, false, false, false, false, false, false], // Default to all false if undefined
+    repeatDays: mission.repeatDays || [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ], // Default to all false if undefined
   }));
 
   /**
@@ -119,20 +127,22 @@ export default function Dashboard() {
   return (
     <>
       <Navbar />
-      <div className="flex h-[100vh] p-6 space-x-6">
+      <div className="flex flex-col xl:flex-row p-6 gap-6 min-h-fit lg:min-h-screen">
         {/* Calendar Section */}
-        <div className="h-[90vh] flex-2 bg-white/30 backdrop-blur-lg border border-white/40 rounded-lg shadow-lg p-6">
+        <div className="w-full xl:flex-2 bg-white/30 backdrop-blur-lg border border-white/40 rounded-lg shadow-lg p-6">
           <Calendar logs={filteredLogs} userMissions={transformedMissions} />
         </div>
 
         {/* Mission Dashboard Section */}
-        <div className="h-[90vh] flex-1 bg-white/30 backdrop-blur-lg border border-white/40 rounded-lg shadow-lg p-6 overflow-auto">
+        <div className="w-full xl:flex-1 bg-white/30 backdrop-blur-lg border border-white/40 rounded-lg shadow-lg p-6 overflow-auto">
           <h1 className="text-2xl font-bold mb-4">📋 My Mission Dashboard</h1>
 
           {/* Button to reset the mission selection and view all missions */}
           <button
             className={`w-full py-2 mb-4 rounded-lg ${
-              selectedMission === null ? "bg-blue-500 text-white" : "bg-gray-300"
+              selectedMission === null
+                ? "bg-blue-500 text-white"
+                : "bg-gray-300"
             }`}
             onClick={() => setSelectedMission(null)}
           >
@@ -163,13 +173,13 @@ export default function Dashboard() {
                   <h2 className="text-xl font-semibold">
                     {mission.mission.title}
                   </h2>
-                  <p className="text-base ml-2 mr-8 text-gray-600">
+                  <p className="text-base ml-2 mr-8 mb-2 text-gray-600">
                     {mission.mission.description || "No description"}
                   </p>
 
                   {/* Display mission start and end dates along with repeat type */}
                   <p className="text-sm">
-                    📅 {format(parseISO(mission.startDate), "yyyy-MM-dd")} - 📅{" "}
+                    📅 {format(parseISO(mission.startDate), "yyyy-MM-dd")} - {" "}
                     {format(parseISO(mission.endDate), "yyyy-MM-dd")}
                     &nbsp;&nbsp;🔁 {mission.repeatType}
                   </p>
@@ -182,7 +192,7 @@ export default function Dashboard() {
                   )}
 
                   {/* Display mission status */}
-                  <p className="text-sm">📌 Status: {mission.status}</p>
+                  <p className="text-sm mb-2">📌 Status: {mission.status}</p>
 
                   {/* Action buttons to complete or delete missions */}
                   <MissionActions

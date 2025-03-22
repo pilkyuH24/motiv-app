@@ -13,16 +13,24 @@ datasource db {
 enum Status {
   ONGOING
   COMPLETED
-  FAILED
+  FAILED // Need?
 }
 
-// 반복 주기 타입 예시 (필요에 따라 CUSTOM 추가)
 enum MissionRepeatType {
   DAILY
   WEEKLY
   MONTHLY
   CUSTOM
 }
+
+enum MissionType {
+  HEALTH
+  SELF_DEVELOPMENT
+  PRODUCTIVITY
+  MINDFULNESS
+  RELATIONSHIP
+}
+
 
 //
 // =============== Models ===============
@@ -38,14 +46,15 @@ model User {
   userMissions      UserMission[]
   badges            UserBadge[]
   settings          UserSetting?
-  pointTransactions PointTransaction[] // 포인트 변동 로그와 연결
+  pointTransactions PointTransaction[] // Connects to point change logs
 }
 
 model Mission {
   id           Int      @id @default(autoincrement())
   title        String
+  type         MissionType @default(SELF_DEVELOPMENT)
   description  String?
-  rewardPoints Int      @default(0) // 미션 완료 시 제공할 포인트
+  rewardPoints Int      @default(0) // Points awarded upon mission completion
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt 
 
@@ -61,35 +70,35 @@ model UserMission {
 
   status    Status    @default(ONGOING)
   startDate DateTime  @default(now())
-  endDate   DateTime? //
+  endDate   DateTime? // Optional end date
   updatedAt DateTime  @updatedAt 
 
-  // 반복 주기 필드
+  // Mission repeat settings
   repeatType MissionRepeatType @default(DAILY)
-  // 일(0)~토(6)
+  // Sunday(0) to Saturday(6)
   repeatDays Boolean[] @default([false, false, false, false, false, false, false])
 
-  // 로그(진행 기록)와 연결
+  // Logs (tracking progress)
   logs UserMissionLog[]
 
-  // 같은 유저가 동일 미션 중복 선택 불가
+  // Prevent duplicate selection of the same mission by the same user
   @@unique([userId, missionId])
 }
 
 //
-// =============== 새로 추가된 Log 테이블 ===============
+// =============== Newly Added Log Table ===============
 //
 model UserMissionLog {
   id            Int         @id @default(autoincrement())
   userMission   UserMission @relation(fields: [userMissionId], references: [id])
   userMissionId Int
 
-  date      DateTime // 예: 2025-03-06 (UTC 0시) 등
+  date      DateTime // e.g., 2025-03-06 (UTC midnight)
   isDone    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // "같은 userMission + 같은 date" 중복 생성 방지
+  // Prevent duplicate entries for the same (userMission + date)
   @@unique([userMissionId, date])
 }
 
@@ -100,7 +109,7 @@ model Badge {
   id          Int      @id @default(autoincrement())
   title       String   @unique
   description String?
-  condition   String // ex: "한 달간 금연", 실제 로직은 코드에서 판단
+  condition   String // e.g., "No smoking for one month" (actual logic handled in code)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt 
 
@@ -115,32 +124,33 @@ model UserBadge {
   badgeId   Int
   awardedAt DateTime @default(now())
 
-  @@unique([userId, badgeId]) // 같은 뱃지 중복 획득 불가
+  // Prevent earning the same badge more than once
+  @@unique([userId, badgeId])
 }
 
 //
-// =============== 유저 설정(기존 그대로) ===============
+// =============== User Settings (unchanged) ===============
 //
 model UserSetting {
   id        Int      @id @default(autoincrement())
   user      User     @relation(fields: [userId], references: [id])
   userId    Int      @unique
-  settings  Json     @default("{}") // JSON 형식으로 저장
+  settings  Json     @default("{}") // Stored in JSON format
   updatedAt DateTime @updatedAt
 }
 
 //
-// =============== 새로 추가된 포인트 트랜잭션 테이블 ===============
+// =============== Newly Added Point Transaction Table ===============
 //
 model PointTransaction {
   id        Int      @id @default(autoincrement())
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
-  change    Int // +10, -5 등 포인트 증감량
-  reason    String // ex: 'MISSION_COMPLETE', 'BADGE_AWARD', 'ADMIN_ADJUST'
+  change    Int      // Point amount (+10, -5, etc.)
+  reason    String   // e.g., 'MISSION_COMPLETE', 'BADGE_AWARD', 'ADMIN_ADJUST'
   createdAt DateTime @default(now())
-  // 필요에 따라 updatedAt @updatedAt 추가 가능
+  // You can add updatedAt @updatedAt if needed
 
-  // 조회 패턴에 따라 인덱스 추가 고려
+  // Consider adding index based on query patterns
   // @@index([userId, createdAt])
 }

@@ -88,7 +88,7 @@ export async function POST(req: Request) {
     start.setUTCHours(0, 0, 0, 0);
 
     const end = new Date(endDate);
-    end.setUTCHours(23, 59, 59, 999); // Ensures `endDate` is set to the end of the day
+    // end.setUTCHours(23, 59, 59, 999); // Ensures `endDate` is set to the end of the day
 
     // Creates a new `userMission` entry
     const newMission = await prisma.userMission.create({

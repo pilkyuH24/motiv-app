@@ -103,15 +103,15 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen">
+    <div className="flex flex-col items-center">
       <h1 className="text-3xl font-extrabold text-gray-800 mb-4">
         {format(currentDate, "yyyy MMMM")}
       </h1>
 
       {/*  Month change buttons */}
-      <div className="flex justify-between w-full max-w-2xl mb-4">
+      <div className="flex justify-center gap-65 sm:gap-100 lg:justify-between w-full max-w-2xl mb-4 ">
         <button
-          className="w-8 h-8 bg-black hover:bg-gray-600 transition"
+          className="w-4 h-4 sm:w-8 sm:h-8 bg-black hover:bg-gray-600 transition"
           style={{
             clipPath: "polygon(0 50%, 100% 0, 100% 100%)",
           }}
@@ -122,7 +122,7 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
           }
         />
         <button
-          className="w-8 h-8 bg-black hover:bg-gray-600 transition"
+          className="w-4 h-4 sm:w-8 sm:h-8 bg-black hover:bg-gray-600 transition"
           style={{
             clipPath: "polygon(100% 50%, 0 100%, 0 0)",
           }}
@@ -136,7 +136,7 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
 
       <ul className="grid grid-cols-7 gap-2 list-none text-center">
         {dayLabels.map((day) => (
-          <li key={day} className="font-medium text-gray-800 text-lg">
+          <li key={day} className="font-medium text-gray-800 text-sm sm:text-base lg:text-lg">
             {day}
           </li>
         ))}
@@ -165,27 +165,27 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
           const isFutureDay = isFuture(day);
 
           //  Default background color setting
-          let bgColor = "bg-white/25"; // Default (no records)
+          let bgColor = "bg-white/90"; // Default (no records)
 
           if (isFutureDay && totalCount > 0) {
-            bgColor = "bg-gray-300"; //  Gray only if future date with logs
+            bgColor = "bg-gray-300/90"; //  Gray only if future date with logs
           } else if (totalCount === completedCount && completedCount > 0) {
-            bgColor = "bg-blue-500"; //  All completed (blue)
+            bgColor = "bg-blue-500/90"; //  All completed (blue)
           } else if (completedCount > 0 && failedCount > 0) {
-            bgColor = "bg-orange-500"; // ⚠ Partial completion (orange)
+            bgColor = "bg-orange-500/90"; // ⚠ Partial completion (orange)
           } else if (failedCount === totalCount && totalCount > 0) {
-            bgColor = "bg-red-500"; //  All incomplete (red)
+            bgColor = "bg-red-500/90"; //  All incomplete (red)
           }
 
           return (
             <li
               key={day.getTime()}
-              className={`flex flex-col items-center justify-center w-24 h-24 p-4 rounded-lg shadow-md border border-white/20 transition text-lg font-light 
+              className={`flex flex-col items-center justify-center w-8 h-8 sm:w-16 sm:h-16 lg:w-24 lg:h-24 sm:text-base p-4 rounded-lg shadow-md border border-white/20 transition text-lg font-light 
         ${bgColor} ${isToday(day) ? "border-2 border-white" : ""} 
         hover:bg-opacity-80 cursor-pointer`}
               onClick={() => handleDateClick(day)}
             >
-              <time className="text-3xl font-semibold">{format(day, "d")}</time>
+              <time className="text-xl lg:text-3xl font-semibold">{format(day, "d")}</time>
             </li>
           );
         })}
@@ -194,15 +194,15 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
       {/*  Modal (displayed when a date is clicked) */}
       {selectedDate && (
         <div className="fixed inset-0 flex items-center justify-center rounded-lg bg-black/50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4">
-              {format(selectedDate, "yyyy년 MM월 dd일")} Mission Status
+          <div className="bg-white p-6 rounded-lg shadow-lg w-72 lg:w-96 ">
+            <h2 className="text-base lg:text-xl font-bold mb-4">
+              {format(selectedDate, "yyyy-MM-dd")} Mission Status
             </h2>
 
             {modalLogs.length > 0 ? (
               <ul className="space-y-2">
                 {modalLogs.map((log, index) => (
-                  <li key={index} className="flex justify-between text-lg">
+                  <li key={index} className="flex justify-between text-sm lg:text-lg">
                     <span>{log.missionTitle}</span>
                     <span>{log.isDone ? "✅ Completed" : "❌ Incomplete"}</span>
                   </li>
@@ -223,8 +223,6 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
                           (selectedDate.getTime() - start.getTime()) /
                             (1000 * 60 * 60 * 24)
                         ); //  Calculate days difference from start date
-                        
-                        // rest of logic as-is...
 
                         return (
                           isBefore(start, selectedDate!) &&
