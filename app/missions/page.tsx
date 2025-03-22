@@ -17,12 +17,28 @@ export default function MissionsPage() {
   const [missions, setMissions] = useState<Mission[]>([]);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [selectedType, setSelectedType] = useState<string | null>(null); // Type filter
-  const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
-  const [endDate, setEndDate] = useState(new Date().toISOString().split("T")[0]);
-  const [repeatType, setRepeatType] = useState<"DAILY" | "WEEKLY" | "MONTHLY" | "CUSTOM">("WEEKLY");
-  const [repeatDays, setRepeatDays] = useState<boolean[]>([false, false, false, false, false, false, false]);
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [repeatType, setRepeatType] = useState<
+    "DAILY" | "WEEKLY" | "MONTHLY" | "CUSTOM"
+  >("WEEKLY");
+  const [repeatDays, setRepeatDays] = useState<boolean[]>([
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
   const [loading, setLoading] = useState(true);
   const [loadingText, setLoadingText] = useState(false);
+
+  const repeatOptions = ["DAILY", "WEEKLY", "MONTHLY", "CUSTOM"] as const;
 
   useEffect(() => {
     setLoading(true);
@@ -36,8 +52,9 @@ export default function MissionsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const missionTypes = [...new Set(missions.map((m) => m.type).filter(Boolean))]; // falsy 값 제거
-  
+  const missionTypes = [
+    ...new Set(missions.map((m) => m.type).filter(Boolean)),
+  ]; // falsy 값 제거
 
   const filteredMissions = selectedType
     ? missions.filter((mission) => mission.type === selectedType)
@@ -88,7 +105,10 @@ export default function MissionsPage() {
           startDate: start.toISOString(),
           endDate: end.toISOString(),
           repeatType,
-          repeatDays: repeatType === "CUSTOM" ? repeatDays : [false, false, false, false, false, false, false],
+          repeatDays:
+            repeatType === "CUSTOM"
+              ? repeatDays
+              : [false, false, false, false, false, false, false],
         }),
       });
 
@@ -117,7 +137,9 @@ export default function MissionsPage() {
           <div className="flex flex-wrap gap-2 p-4 justify-center">
             <button
               className={`px-4 py-2 rounded-full font-semibold ${
-                selectedType === null ? "bg-rose-500/90 text-white" : "bg-white hover:bg-rose-400/80"
+                selectedType === null
+                  ? "bg-rose-500/90 text-white"
+                  : "bg-white hover:bg-rose-400/80"
               }`}
               onClick={() => setSelectedType(null)}
             >
@@ -127,7 +149,9 @@ export default function MissionsPage() {
               <button
                 key={type}
                 className={`px-4 py-2 rounded-full font-semibold ${
-                  selectedType === type ? "bg-rose-500/90 text-white" : "bg-white hover:bg-rose-400/80"
+                  selectedType === type
+                    ? "bg-rose-500/90 text-white"
+                    : "bg-white hover:bg-rose-400/80"
                 }`}
                 onClick={() => setSelectedType(type)}
               >
@@ -143,11 +167,16 @@ export default function MissionsPage() {
                 <div className="flip-card-inner">
                   <div className="flip-card-front rounded-2xl">
                     <h2 className="text-3xl mb-5 ">{mission.title}</h2>
-                    <p className="text-start text-base text-gray-700">{mission.description || "No description available"}</p>
+                    <p className="text-start text-base text-gray-700">
+                      {mission.description || "No description available"}
+                    </p>
                   </div>
                   <div className="flip-card-back rounded-2xl">
                     <h2 className="title">{mission.title}</h2>
-                    <button className="challenge-button" onClick={() => openMissionForm(mission)}>
+                    <button
+                      className="challenge-button"
+                      onClick={() => openMissionForm(mission)}
+                    >
                       Start Mission
                     </button>
                   </div>
@@ -186,15 +215,19 @@ export default function MissionsPage() {
               className="w-full p-2 border rounded-md"
             />
 
-            <label className="block mt-4 text-sm font-medium">Repeat Type</label>
+            <label className="block mt-4 text-sm font-medium">
+              Repeat Type
+            </label>
             <div className="flex flex-wrap gap-2">
-              {["DAILY", "WEEKLY", "MONTHLY", "CUSTOM"].map((type) => (
+              {repeatOptions.map((type) => (
                 <button
                   key={type}
                   className={`m-1 px-3 py-1 rounded-md ${
-                    repeatType === type ? "bg-rose-400 text-white" : "bg-white hover:bg-rose-300/80"
+                    repeatType === type
+                      ? "bg-rose-400 text-white"
+                      : "bg-white hover:bg-rose-300/80"
                   }`}
-                  onClick={() => setRepeatType(type as any)}
+                  onClick={() => setRepeatType(type)}
                 >
                   {type}
                 </button>
@@ -203,19 +236,25 @@ export default function MissionsPage() {
 
             {repeatType === "CUSTOM" && (
               <div>
-                <label className="block mt-4 text-sm font-medium">Select Repeat Days</label>
+                <label className="block mt-4 text-sm font-medium">
+                  Select Repeat Days
+                </label>
                 <div className="flex flex-wrap gap-2">
-                  {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day, index) => (
-                    <button
-                      key={day}
-                      className={`m-1 px-3 py-1 rounded-md ${
-                        repeatDays[index] ? "bg-rose-400 text-white" : "bg-white hover:bg-rose-300/80"
-                      }`}
-                      onClick={() => toggleRepeatDay(index)}
-                    >
-                      {day}
-                    </button>
-                  ))}
+                  {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map(
+                    (day, index) => (
+                      <button
+                        key={day}
+                        className={`m-1 px-3 py-1 rounded-md ${
+                          repeatDays[index]
+                            ? "bg-rose-400 text-white"
+                            : "bg-white hover:bg-rose-300/80"
+                        }`}
+                        onClick={() => toggleRepeatDay(index)}
+                      >
+                        {day}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
             )}
