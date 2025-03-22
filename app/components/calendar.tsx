@@ -55,31 +55,43 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
 
   //  Get missions for future dates
   useEffect(() => {
-    const upcomingMissions = userMissions.flatMap((mission) => {
-      const missionStart = parseISO(mission.startDate);
-      const missionEnd = mission.endDate ? parseISO(mission.endDate) : null;
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
 
-      return isFuture(missionStart)
-        ? Array.from(
-            {
-              length: Math.ceil(
-                (missionEnd
-                  ? missionEnd.getTime() - missionStart.getTime()
-                  : 7 * 86400000) / 86400000
-              ),
-            },
-            (_, i) => ({
-              date: format(
-                new Date(missionStart.getTime() + i * 86400000),
-                "yyyy-MM-dd"
-              ),
-              isDone: false,
-              missionTitle: mission.missionTitle,
-            })
-          )
-        : [];
+    const upcomingMissions = userMissions.flatMap((mission) => {
+      const start = parseISO(mission.startDate);
+      const end = mission.endDate
+        ? parseISO(mission.endDate)
+        : new Date(today.getTime() + 14 * 86400000); // fallback
+
+      const days = eachDayOfInterval({ start: today, end });
+
+      return days
+        .filter((day) => {
+          const dayIndex = day.getUTCDay();
+          const daysDifference = Math.floor(
+            (day.getTime() - start.getTime()) / 86400000
+          );
+
+          return (
+            isBefore(start, day) &&
+            (!end || isBefore(day, end) || isEqual(day, end)) &&
+            ((mission.repeatType === "CUSTOM" &&
+              mission.repeatDays?.[dayIndex]) ||
+              (mission.repeatType === "WEEKLY" && daysDifference % 7 === 0) ||
+              (mission.repeatType === "MONTHLY" &&
+                day.getDate() === start.getDate()) ||
+              mission.repeatType === "DAILY")
+          );
+        })
+        .map((day) => ({
+          date: format(day, "yyyy-MM-dd"),
+          isDone: false,
+          missionTitle: mission.missionTitle,
+        }));
     });
 
+    // console.log("✅ futureMissions", upcomingMissions); // debuging
     setFutureMissions(upcomingMissions);
   }, [userMissions]);
 
@@ -136,7 +148,10 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
 
       <ul className="grid grid-cols-7 gap-2 list-none text-center">
         {dayLabels.map((day) => (
-          <li key={day} className="font-medium text-gray-800 text-sm sm:text-base lg:text-lg">
+          <li
+            key={day}
+            className="font-medium text-gray-800 text-sm sm:text-base lg:text-lg"
+          >
             {day}
           </li>
         ))}
@@ -185,7 +200,9 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
         hover:bg-opacity-80 cursor-pointer`}
               onClick={() => handleDateClick(day)}
             >
-              <time className="text-xl lg:text-3xl font-semibold">{format(day, "d")}</time>
+              <time className="text-xl lg:text-3xl font-semibold">
+                {format(day, "d")}
+              </time>
             </li>
           );
         })}
@@ -202,9 +219,18 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
             {modalLogs.length > 0 ? (
               <ul className="space-y-2">
                 {modalLogs.map((log, index) => (
-                  <li key={index} className="flex justify-between text-sm lg:text-lg">
+                  <li
+                    key={index}
+                    className="flex justify-between text-sm lg:text-lg"
+                  >
                     <span>{log.missionTitle}</span>
-                    <span>{log.isDone ? "✅ Completed" : "❌ Incomplete"}</span>
+                    <span>
+                      {isFuture(selectedDate!)
+                        ? "➖"
+                        : log.isDone
+                        ? "✅ Completed"
+                        : "❌ Incomplete"}
+                    </span>
                   </li>
                 ))}
               </ul>
