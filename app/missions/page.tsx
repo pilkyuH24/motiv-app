@@ -16,7 +16,6 @@ interface Mission {
 export default function MissionsPage() {
   const [missions, setMissions] = useState<Mission[]>([]);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
-  const [selectedType, setSelectedType] = useState<string | null>(null); // Type filter
   const [startDate, setStartDate] = useState(
     new Date().toISOString().split("T")[0]
   );
