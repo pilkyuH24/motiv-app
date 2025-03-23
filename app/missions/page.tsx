@@ -45,20 +45,17 @@ export default function MissionsPage() {
     fetch("/api/missions")
       .then((res) => res.json())
       .then((data) => {
-        // console.log("✅ missions data:", data);
         setMissions(data);
       })
       .catch((error) => console.error("Error fetching missions:", error))
       .finally(() => setLoading(false));
   }, []);
 
-  const missionTypes = [
-    ...new Set(missions.map((m) => m.type).filter(Boolean)),
-  ]; // falsy 값 제거
-
-  const filteredMissions = selectedType
-    ? missions.filter((mission) => mission.type === selectedType)
-    : missions;
+  const groupedMissions = missions.reduce((acc, mission) => {
+    if (!acc[mission.type]) acc[mission.type] = [];
+    acc[mission.type].push(mission);
+    return acc;
+  }, {} as Record<string, Mission[]>);
 
   const openMissionForm = (mission: Mission) => {
     setSelectedMission(mission);
@@ -133,61 +130,42 @@ export default function MissionsPage() {
         <>
           <Navbar />
 
-          {/* Type filter buttons */}
-          <div className="flex flex-wrap gap-2 p-4 justify-center">
-            <button
-              className={`px-4 py-2 rounded-full font-semibold ${
-                selectedType === null
-                  ? "bg-rose-500/90 text-white"
-                  : "bg-white hover:bg-rose-400/80"
-              }`}
-              onClick={() => setSelectedType(null)}
-            >
-              All
-            </button>
-            {missionTypes.map((type) => (
-              <button
-                key={type}
-                className={`px-4 py-2 rounded-full font-semibold ${
-                  selectedType === type
-                    ? "bg-rose-500/90 text-white"
-                    : "bg-white hover:bg-rose-400/80"
-                }`}
-                onClick={() => setSelectedType(type)}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-
-          {/* Mission cards */}
-          <div className="grid sm:grid-cols-1 p-8 md:grid-cols-2 xl:grid-cols-4 gap-8">
-            {filteredMissions.map((mission) => (
-              <div className="flip-card" key={mission.id}>
-                <div className="flip-card-inner">
-                  <div className="flip-card-front rounded-2xl">
-                    <h2 className="text-3xl mb-5 ">{mission.title}</h2>
-                    <p className="text-start text-base text-gray-700">
-                      {mission.description || "No description available"}
-                    </p>
-                  </div>
-                  <div className="flip-card-back rounded-2xl">
-                    <h2 className="title">{mission.title}</h2>
-                    <button
-                      className="challenge-button"
-                      onClick={() => openMissionForm(mission)}
-                    >
-                      Start Mission
-                    </button>
-                  </div>
+          {Object.entries(groupedMissions).map(([type, missions]) => (
+            <div key={type} className="mb-12">
+              <div className="flex items-center justify-between px-8 mb-4">
+                <h2 className="text-2xl font-bold">{type}</h2>
+                <div className="flex gap-2">
                 </div>
               </div>
-            ))}
-          </div>
+
+              <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 px-8">
+                {missions.map((mission) => (
+                  <div className="flip-card" key={mission.id}>
+                    <div className="flip-card-inner">
+                      <div className="flip-card-front rounded-2xl">
+                        <h2 className="text-3xl mb-5 ">{mission.title}</h2>
+                        <p className="text-start text-base text-gray-700">
+                          {mission.description || "No description available"}
+                        </p>
+                      </div>
+                      <div className="flip-card-back rounded-2xl">
+                        <h2 className="title">{mission.title}</h2>
+                        <button
+                          className="challenge-button"
+                          onClick={() => openMissionForm(mission)}
+                        >
+                          Start Mission
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </>
       )}
 
-      {/* Mission Start Modal */}
       {selectedMission && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50">
           <div

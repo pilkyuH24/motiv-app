@@ -70,7 +70,7 @@ model UserMission {
 
   status    Status    @default(ONGOING)
   startDate DateTime  @default(now())
-  endDate   DateTime? // Optional end date
+  endDate   DateTime? 
   updatedAt DateTime  @updatedAt 
 
   // Mission repeat settings

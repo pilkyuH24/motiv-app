@@ -6,7 +6,7 @@ export async function GET() {
   try {
     // Fetch all missions from the database
     const missions = await prisma.mission.findMany();
-    console.log("🧪 missions from DB:", missions);
+    // console.log("🧪 missions from DB:", missions);
     return NextResponse.json(missions, { status: 200 });
   } catch (error) {
     console.error("Error fetching missions:", error); 

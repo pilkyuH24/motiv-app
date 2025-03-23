@@ -31,11 +31,8 @@ export default function Dashboard() {
   const [userMissions, setUserMissions] = useState<UserMission[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMission, setSelectedMission] = useState<string | null>(null);
+  const [showCompleted, setShowCompleted] = useState(false);
 
-  /**
-   * Fetches the user's missions from the API and updates the state.
-   * This function is also used to refresh the missions when an update occurs.
-   */
   const refreshMissions = async () => {
     setLoading(true);
     try {
@@ -52,16 +49,10 @@ export default function Dashboard() {
     }
   };
 
-  /**
-   * Runs once when the component mounts to load the missions.
-   */
   useEffect(() => {
     refreshMissions();
   }, []);
 
-  /**
-   * Displays a loading component while data is being fetched.
-   */
   if (loading) {
     return <Loader />;
   }
@@ -69,11 +60,29 @@ export default function Dashboard() {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
-  /**
-   * Converts the mission logs from UTC format to KST (or local time).
-   * This ensures consistency when displaying the logs in the calendar.
-   */
-  const allLogs: Log[] = userMissions.flatMap((mission) =>
+  const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+  const formatRepeatDays = (repeatDays?: boolean[]) => {
+    if (!repeatDays) return "None";
+    return repeatDays
+      .map((active, index) => (active ? daysOfWeek[index] : null))
+      .filter(Boolean)
+      .join(", ");
+  };
+
+  const activeMissions = userMissions.filter((m) => m.status !== "COMPLETED");
+  const completedMissions = userMissions.filter(
+    (m) => m.status === "COMPLETED"
+  );
+
+  const selectedMissionData = userMissions.find(
+    (m) => m.mission.title === selectedMission
+  );
+
+  const calendarSource = selectedMissionData
+    ? [selectedMissionData]
+    : activeMissions;
+
+  const calendarLogs: Log[] = calendarSource.flatMap((mission) =>
     mission.logs.map((log) => ({
       date: format(parseISO(log.date), "yyyy-MM-dd"),
       isDone: log.isDone,
@@ -81,12 +90,7 @@ export default function Dashboard() {
     }))
   );
 
-  /**
-   * Transforms user missions to match the expected format for the Calendar component.
-   * - Ensures each mission has a missionTitle property.
-   * - Provides default values for repeatDays to prevent undefined issues.
-   */
-  const transformedMissions = userMissions.map((mission) => ({
+  const calendarMissions = calendarSource.map((mission) => ({
     id: mission.id,
     missionTitle: mission.mission.title,
     startDate: mission.startDate,
@@ -100,44 +104,20 @@ export default function Dashboard() {
       false,
       false,
       false,
-    ], // Default to all false if undefined
+    ],
   }));
-
-  /**
-   * Filters the logs to display only those related to the selected mission.
-   * If no mission is selected, all logs are displayed.
-   */
-  const filteredLogs = selectedMission
-    ? allLogs.filter((log) => log.missionTitle === selectedMission)
-    : allLogs;
-
-  /**
-   * Converts the repeatDays boolean array into a human-readable format.
-   * Example: [false, true, true, false, false, true, false] → "MON, TUE, FRI"
-   */
-  const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-  const formatRepeatDays = (repeatDays?: boolean[]) => {
-    if (!repeatDays) return "None"; // If repeatDays is undefined, return "None"
-    return repeatDays
-      .map((active, index) => (active ? daysOfWeek[index] : null)) // Map active days to their corresponding labels
-      .filter(Boolean) // Remove null values
-      .join(", "); // Join into a comma-separated string
-  };
 
   return (
     <>
       <Navbar />
       <div className="flex flex-col xl:flex-row p-6 gap-6 min-h-fit lg:min-h-screen">
-        {/* Calendar Section */}
         <div className="w-full xl:flex-2 bg-white/30 backdrop-blur-lg border border-white/40 rounded-lg shadow-lg p-6">
-          <Calendar logs={filteredLogs} userMissions={transformedMissions} />
+          <Calendar logs={calendarLogs} userMissions={calendarMissions} />
         </div>
 
-        {/* Mission Dashboard Section */}
         <div className="w-full xl:flex-1 bg-white/30 backdrop-blur-lg border border-white/40 rounded-lg shadow-lg p-6 overflow-auto">
           <h1 className="text-2xl font-bold mb-4">📋 My Mission Dashboard</h1>
 
-          {/* Button to reset the mission selection and view all missions */}
           <button
             className={`w-full py-2 mb-4 rounded-lg ${
               selectedMission === null
@@ -146,15 +126,14 @@ export default function Dashboard() {
             }`}
             onClick={() => setSelectedMission(null)}
           >
-            🔄 View All Missions
+            🔄 View All Active Missions
           </button>
 
-          {/* Display a message if there are no active missions */}
-          {userMissions.length === 0 ? (
+          {activeMissions.length === 0 ? (
             <p>No active missions.</p>
           ) : (
             <ul className="space-y-4">
-              {userMissions.map((mission) => (
+              {activeMissions.map((mission) => (
                 <li
                   key={mission.id}
                   className={`border p-4 rounded-lg shadow bg-white/20 backdrop-blur-md cursor-pointer ${
@@ -176,33 +155,77 @@ export default function Dashboard() {
                   <p className="text-base ml-2 mr-8 mb-2 text-gray-600">
                     {mission.mission.description || "No description"}
                   </p>
-
-                  {/* Display mission start and end dates along with repeat type */}
                   <p className="text-sm">
-                    📅 {format(parseISO(mission.startDate), "yyyy-MM-dd")} - {" "}
+                    📅 {format(parseISO(mission.startDate), "yyyy-MM-dd")} -{" "}
                     {format(parseISO(mission.endDate), "yyyy-MM-dd")}
                     &nbsp;&nbsp;🔁 {mission.repeatType}
                   </p>
-
-                  {/* Display repeat days if the mission has a custom schedule */}
                   {mission.repeatType === "CUSTOM" && (
                     <p className="text-sm">
                       📅 Repeat Days: {formatRepeatDays(mission.repeatDays)}
                     </p>
                   )}
-
-                  {/* Display mission status */}
                   <p className="text-sm mb-2">📌 Status: {mission.status}</p>
-
-                  {/* Action buttons to complete or delete missions */}
                   <MissionActions
                     missionId={mission.id}
-                    logs={mission.logs} // Pass today's logs for mission tracking
+                    logs={mission.logs}
+                    status={mission.status}
                     onMissionUpdate={refreshMissions}
                   />
                 </li>
               ))}
             </ul>
+          )}
+
+          <button
+            className="mt-8 w-full py-2 mb-4 rounded-lg bg-gray-100 hover:bg-gray-300 text-gray-800"
+            onClick={() => setShowCompleted((prev) => !prev)}
+          >
+            {showCompleted
+              ? "🙈 Hide Completed Missions"
+              : "✅ View Completed Missions"}
+          </button>
+
+          {showCompleted && (
+            <div className="mt-6">
+              <h2 className="text-xl font-bold mb-2">✅ Completed Missions</h2>
+              {completedMissions.length === 0 ? (
+                <p>No completed missions.</p>
+              ) : (
+                <ul className="space-y-4">
+                  {completedMissions.map((mission) => (
+                    <li
+                      key={mission.id}
+                      className="border p-4 rounded-lg shadow bg-white/10 backdrop-blur-md opacity-80 cursor-pointer"
+                      onClick={() =>
+                        setSelectedMission(
+                          selectedMission === mission.mission.title
+                            ? null
+                            : mission.mission.title
+                        )
+                      }
+                    >
+                      <h2 className="text-lg font-semibold">
+                        {mission.mission.title}
+                      </h2>
+                      <p className="text-sm text-gray-600 mb-1">
+                        📅 {format(parseISO(mission.startDate), "yyyy-MM-dd")} -{" "}
+                        {format(parseISO(mission.endDate), "yyyy-MM-dd")}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        📌 Status: {mission.status}
+                      </p>
+                      <MissionActions
+                        missionId={mission.id}
+                        logs={mission.logs}
+                        status={mission.status}
+                        onMissionUpdate={refreshMissions}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
         </div>
       </div>

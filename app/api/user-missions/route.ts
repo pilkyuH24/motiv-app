@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from '@/lib/auth';
 import { addDays, addWeeks, addMonths, isBefore } from "date-fns";
+import {missionCompleteHandler} from "@/app/utils/missionCompleteHandler";
 
 // Handles GET requests to retrieve all user missions
 export async function GET() {
@@ -23,9 +24,34 @@ export async function GET() {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // console.log("[user-missions] Found user:", user.id);
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
 
-    const userMissions = await prisma.userMission.findMany({
+    // Get all missions first
+    const missionsToCheck = await prisma.userMission.findMany({
+      where: { userId: user.id },
+      select: {
+        id: true,
+        status: true,
+        endDate: true,
+      },
+    });
+
+    // Auto-complete missions that are still ONGOING but endDate has passed
+    await Promise.all(
+      missionsToCheck.map(async (mission) => {
+        if (
+          mission.status === "ONGOING" &&
+          mission.endDate &&
+          isBefore(new Date(mission.endDate), today)
+        ) {
+          await missionCompleteHandler(mission.id);
+        }
+      })
+    );
+
+    // Fetch updated list after applying reward/completion logic
+    const updatedMissions = await prisma.userMission.findMany({
       where: { userId: user.id },
       include: {
         mission: {
@@ -40,8 +66,7 @@ export async function GET() {
       },
     });
 
-    // Ensures `repeatDays` is always an array of booleans
-    const formattedMissions = userMissions.map((mission) => ({
+    const formattedMissions = updatedMissions.map((mission) => ({
       ...mission,
       repeatDays: mission.repeatDays ?? [false, false, false, false, false, false, false],
     }));
@@ -59,6 +84,7 @@ export async function GET() {
     );
   }
 }
+
 
 // Handles POST requests to add a new mission
 export async function POST(req: Request) {

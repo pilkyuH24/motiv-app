@@ -13,10 +13,10 @@ export default function Navbar() {
     <nav className="top-0 w-full bg-gradient-to-br from-orange-200 to-pink-200 p-2 text-white shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo(text) */}
-        <div className="text-3xl font-bold drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.2)]">Motivation App</div>
+        <div className="text-xl ml-2 sm:text-3xl font-bold drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.2)]">Motivation App</div>
 
         {/* Sign In/Out and Links */}
-        <div className="flex-1 flex justify-end gap-6 items-center text-xl ">
+        <div className="flex-1 flex justify-end gap-6 items-center text-base sm:text-xl ">
           {!session ? (
             <LoginButton />
           ) : (

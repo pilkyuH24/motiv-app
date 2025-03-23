@@ -7,6 +7,7 @@ import { format, parseISO } from "date-fns";
 interface MissionActionsProps {
   missionId: number; // Unique identifier for the mission
   logs: { date: string; isDone: boolean }[]; // Array of logs for tracking mission completion
+  status: "ONGOING" | "COMPLETED" | "FAILED";
   onMissionUpdate: () => void; // Callback function to refresh mission data
 }
 
@@ -14,6 +15,7 @@ interface MissionActionsProps {
 export default function MissionActions({
   missionId,
   logs,
+  status,
   onMissionUpdate,
 }: MissionActionsProps) {
   const [loading, setLoading] = useState(false); // State to manage loading during API calls
@@ -93,14 +95,14 @@ export default function MissionActions({
       {/* Button to mark today's mission as completed */}
       <button
         className={`px-4 py-2 rounded-lg transition ${
-          isCompletedToday
+          isCompletedToday || status === "COMPLETED"
             ? "bg-green-500 text-white cursor-not-allowed shadow-[2px_2px_5px_rgba(0,0,0,0.3),_-2px_-2px_5px_rgba(255,255,255,0.5)]"
             : "bg-gray-300 text-gray-600 transition-all duration-200 ease-in-out hover:bg-green-500 hover:text-white shadow-inner hover:shadow-[2px_2px_5px_rgba(0,0,0,0.3),_-2px_-2px_5px_rgba(255,255,255,0.5)]"
         }`}
         onClick={handleCompleteToday}
-        disabled={isCompletedToday || loading} // Disable if already completed
+        disabled={isCompletedToday || status === "COMPLETED" || loading}
       >
-        {isCompletedToday
+        {isCompletedToday || status === "COMPLETED"
           ? "Completed"
           : loading
           ? "Completing..."

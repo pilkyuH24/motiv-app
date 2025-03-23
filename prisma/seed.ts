@@ -29,6 +29,12 @@ async function main() {
     create: { email: "user2@test.com", name: "User Two" },
   });
 
+  const user3 = await prisma.user.upsert({
+    where: { email: "hpil331@gmail.com" },
+    update: {},
+    create: { email: "hpil331@gmail.com", name: "User Three" },
+  });
+
   console.log("✅ Users seeded.");
 
   // ✅ Define mission data with types
@@ -57,6 +63,11 @@ async function main() {
 
     // ===== SELF_DEVELOPMENT =====
     {
+        title: "💻 Practice Coding",
+        description: "Solve at least one coding problem a day to improve algorithmic thinking.",
+        type: "SELF_DEVELOPMENT",
+    },
+    {
         title: "📖 Read a Book",
         description: "Read for at least 30 minutes a day to stimulate intellectual growth.",
         type: "SELF_DEVELOPMENT",
@@ -64,11 +75,6 @@ async function main() {
     {
         title: "📝 Write a Journal",
         description: "Reflect on your day and organize your thoughts and emotions by writing a daily journal.",
-        type: "SELF_DEVELOPMENT",
-    },
-    {
-        title: "💻 Practice Coding",
-        description: "Solve at least one coding problem a day to improve algorithmic thinking.",
         type: "SELF_DEVELOPMENT",
     },
     {
@@ -161,10 +167,10 @@ async function main() {
   today.setUTCHours(0, 0, 0, 0);
 
   const sevenDaysAgo = new Date(today);
-  sevenDaysAgo.setDate(today.getDate() - 7);
+  sevenDaysAgo.setDate(today.getDate() - 14);
 
   const sevenDaysLater = new Date(today);
-  sevenDaysLater.setDate(today.getDate() + 7);
+  sevenDaysLater.setDate(today.getDate() - 1);
   sevenDaysLater.setUTCHours(23, 59, 59, 999);
 
   const missionTitles = missions.map((m) => m.title);
@@ -177,6 +183,7 @@ async function main() {
     { userId: user1.id, missionTitle: "🏋️ Exercise", repeatType: "DAILY" },
     { userId: user2.id, missionTitle: "🌙 Sleep Early", repeatType: "DAILY" },
     { userId: user2.id, missionTitle: "📖 Read a Book", repeatType: "DAILY" },
+    { userId: user3.id, missionTitle: "📖 Read a Book", repeatType: "DAILY" },
   ];
 
   for (const { userId, missionTitle, repeatType } of userMissions) {
@@ -206,7 +213,7 @@ async function main() {
   for (const userMission of userMissionsData) {
     const repeatDays = userMission.repeatDays as boolean[];
 
-    for (let i = -7; i <= 7; i++) {
+    for (let i = -14; i <= -1; i++) {
       const logDate = new Date(today);
       logDate.setDate(today.getDate() + i);
 
