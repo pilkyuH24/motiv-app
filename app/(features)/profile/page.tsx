@@ -1,8 +1,8 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { LogoutButton } from "../components/auth";
-import Loader from "../components/Loader";
+import { LogoutButton } from "@/components/ui/logInOutBtn";
+import Loader from "@/components/ui/Loader";
 import { redirect } from "next/navigation";
 
 export default function ProfilePage() {

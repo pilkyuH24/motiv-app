@@ -1,20 +1,22 @@
+// app/missions/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import "./FlipCard.css";
-import Loader from "../components/Loader";
-import Navbar from "../components/navbar";
+import "@/components/missions/MissionCard.css";
+import Loader from "@/components/ui/Loader";
+import Navbar from "@/components/layout/navbar";
+import { useMissions } from "@/lib/hooks/useMissions"
 
 interface Mission {
   id: number;
   title: string;
   description?: string;
   rewardPoints: number;
-  type: string; // e.g., "HEALTH", "PRODUCTIVITY"
+  type: string; 
 }
 
 export default function MissionsPage() {
-  const [missions, setMissions] = useState<Mission[]>([]);
+  const { missions, loading, error } = useMissions(); // custom hook added
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [startDate, setStartDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -34,21 +36,9 @@ export default function MissionsPage() {
     false,
     false,
   ]);
-  const [loading, setLoading] = useState(true);
   const [loadingText, setLoadingText] = useState(false);
 
   const repeatOptions = ["DAILY", "WEEKLY", "MONTHLY", "CUSTOM"] as const;
-
-  useEffect(() => {
-    setLoading(true);
-    fetch("/api/missions")
-      .then((res) => res.json())
-      .then((data) => {
-        setMissions(data);
-      })
-      .catch((error) => console.error("Error fetching missions:", error))
-      .finally(() => setLoading(false));
-  }, []);
 
   const groupedMissions = missions.reduce((acc, mission) => {
     if (!acc[mission.type]) acc[mission.type] = [];
@@ -130,7 +120,7 @@ export default function MissionsPage() {
           <Navbar />
 
           {Object.entries(groupedMissions).map(([type, missions]) => (
-            <div key={type} className="mb-12">
+            <div key={type} className="my-12">
               <div className="flex items-center justify-between px-8 mb-4">
                 <h2 className="text-2xl font-bold">{type}</h2>
                 <div className="flex gap-2">

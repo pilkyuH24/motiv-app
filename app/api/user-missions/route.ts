@@ -1,9 +1,10 @@
+//app/api/user-missions/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from '@/lib/auth';
 import { addDays, addWeeks, addMonths, isBefore } from "date-fns";
-import {missionCompleteHandler} from "@/app/utils/missionCompleteHandler";
+import { missionCompleteHandler } from "@/lib/utils/missionCompleteHandler";
 
 // Handles GET requests to retrieve all user missions
 export async function GET() {
@@ -114,7 +115,6 @@ export async function POST(req: Request) {
     start.setUTCHours(0, 0, 0, 0);
 
     const end = new Date(endDate);
-    // end.setUTCHours(23, 59, 59, 999); // Ensures `endDate` is set to the end of the day
 
     // Creates a new `userMission` entry
     const newMission = await prisma.userMission.create({
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
       if (repeatType === "DAILY") {
         logs.push({ userMissionId: newMission.id, date: new Date(currentDate), isDone: false });
         currentDate = addDays(currentDate, 1);
-      } else if (repeatType === "WEEKLY") {
+      } else if (repeatType === "WEEKLY") { // 수정필요 ! 하루씩 밀려 있음
         logs.push({ userMissionId: newMission.id, date: new Date(currentDate), isDone: false });
         currentDate = addWeeks(currentDate, 1);
       } else if (repeatType === "MONTHLY") {
@@ -147,7 +147,7 @@ export async function POST(req: Request) {
         currentDate = addMonths(currentDate, 1);
       } else if (repeatType === "CUSTOM" && repeatDays[dayIndex]) {
         logs.push({ userMissionId: newMission.id, date: new Date(currentDate), isDone: false });
-        currentDate = addDays(currentDate, 1);
+        currentDate = addDays(currentDate, 1); 
       } else {
         currentDate = addDays(currentDate, 1);
       }

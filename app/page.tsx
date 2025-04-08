@@ -2,8 +2,7 @@
 
 import React from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-import { LoginButton } from "./components/auth";
-import "./home.css";
+import { LoginButton } from "@/components/ui/logInOutBtn";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -148,7 +147,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className=".animated-footer w-full bg-[#a2d2ff] text-white backdrop-blur-lg text-base py-2 px-15 mt-auto flex justify-end">
+        <footer className="w-full bg-[#a2d2ff] text-white backdrop-blur-lg text-base py-2 px-15 mt-auto flex justify-end">
         <Link href="https://github.com/pilkyuH24/motiv-app" className="underline" >Github link</Link>
           <div className="ml-4">@Pilkyu Han </div>    
         </footer>

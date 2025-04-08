@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import React from "react";
-import { LoginButton } from "./auth";
+import { LoginButton } from "@/components/ui/logInOutBtn";
 import { useSession } from "next-auth/react";
-import "./auth.css";
 
 export default function Navbar() {
   const { data: session } = useSession();
