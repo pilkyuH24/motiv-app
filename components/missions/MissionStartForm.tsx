@@ -17,7 +17,7 @@ export default function MissionStartForm({
   const [startDate, setStartDate] = useState(todayUTCString);
   const [endDate, setEndDate] = useState(todayUTCString);
 
-  const [durationMonths, setDurationMonths] = useState(1);
+  const [durationMonths, setDurationMonths] = useState(0);
   const [repeatType, setRepeatType] = useState<RepeatType>("DAILY");
   const [repeatDays, setRepeatDays] = useState<boolean[]>([
     false,
@@ -94,7 +94,7 @@ export default function MissionStartForm({
           Duration (in months)
         </label>
         <div className="flex flex-wrap justify-start gap-2">
-          {[1, 2, 3, 6, 12].map((month) => (
+          {[0, 1, 2, 3, 6, 12].map((month) => (
             <button
               key={month}
               className={`px-3 py-1 rounded-md ${
@@ -112,14 +112,14 @@ export default function MissionStartForm({
         <label className="block mt-4 text-sm font-medium">End Date</label>
         <input
           type="date"
-          value={startDate}
+          value={endDate}
           // readOnly
           onChange={(e) => setEndDate(e.target.value)} // For mission complete test
           className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
         />
         <p className="text-sm text-gray-600 mt-1">
           * Automatically set to {durationMonths} month
-          {durationMonths > 1 ? "s" : ""} after the start date. (set to today for test) 
+          {durationMonths > 1 ? "s" : ""} after the start date. (0 for test) 
         </p>
         <div className="text-red-600 my-1">
           <p>UTC로 설정되어있어 날짜가 다르게 보일수 있습니다. </p>
