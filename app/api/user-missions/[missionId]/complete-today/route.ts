@@ -1,30 +1,80 @@
+// app/api/user-missions/complete-today/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { format } from "date-fns";
+import { evaluateAllBadgesForUser } from "@/lib/utils/badgeEngine";
+import { Badge } from "@prisma/client";
+import { authenticateUser, extractMissionId, verifyMissionOwnership } from "@/lib/auth-utils";
 
 export async function POST(req: Request) {
   try {
-    // Extracts `missionId` from the URL
+    const authResult = await authenticateUser();
+    if (authResult.error) return authResult.error;
+
+    // Extract mission ID from URL
     const url = new URL(req.url);
-    const missionId = parseInt(url.pathname.split("/").slice(-2, -1)[0]);
+    const idResult = extractMissionId(url, 'secondLast');
+    if (idResult.error) return idResult.error;
 
-    if (isNaN(missionId)) {
-      return NextResponse.json({ message: "Invalid mission ID" }, { status: 400 });
-    }
+    // Verify mission ownership (including mission data)
+    const ownershipResult = await verifyMissionOwnership(
+      idResult.missionId, 
+      authResult.user.id,
+      { mission: true }
+    );
+    if (ownershipResult.error) return ownershipResult.error;
 
-    // Sets the current date in UTC with time set to 00:00:00 UTC
+    const userMission = ownershipResult.userMission;
+
     const todayUTC = new Date();
     todayUTC.setUTCHours(0, 0, 0, 0);
+    const todayFormatted = format(todayUTC, "yyyy-MM-dd");
 
-    // console.log(`Completing mission ${missionId} for today (UTC: ${todayUTC.toISOString()})`);
-
-    // Updates the mission log for the given mission ID and date, or creates a new entry if it does not exist
+    // Create or update mission log for today
     await prisma.userMissionLog.upsert({
-      where: { userMissionId_date: { userMissionId: missionId, date: todayUTC } },
+      where: { userMissionId_date: { userMissionId: idResult.missionId, date: todayUTC } },
       update: { isDone: true },
-      create: { userMissionId: missionId, date: todayUTC, isDone: true },
+      create: { userMissionId: idResult.missionId, date: todayUTC, isDone: true },
     });
 
-    return NextResponse.json({ message: "Mission completed for today (UTC)!" });
+    // Check if today is the mission's end date
+    const isEndDate = userMission.endDate 
+      ? format(userMission.endDate, "yyyy-MM-dd") === todayFormatted
+      : false;
+
+    // Initialize list of newly awarded badges
+    let newlyAwardedBadges: { id: number; title: string; description: string | null, rank: number }[] = [];
+
+    // If it's the end date and the mission isn't marked completed, mark it completed and evaluate badges
+    if (isEndDate && userMission.status !== "COMPLETED") {
+      await prisma.userMission.update({
+        where: { id: idResult.missionId },
+        data: { status: "COMPLETED" },
+      });
+
+      try {
+        // Evaluate badges for the user
+        const badgesResult = await evaluateAllBadgesForUser(authResult.user.id);
+        
+        if (Array.isArray(badgesResult)) {
+          newlyAwardedBadges = badgesResult.map((badge: Badge) => ({
+            id: badge.id,
+            title: badge.title,
+            description: badge.description,
+            rank: badge.rank
+          }));
+        }
+      } catch (error) {
+        console.error("Error evaluating badges:", error);
+        newlyAwardedBadges = [];
+      }
+    }
+
+    return NextResponse.json({ 
+      message: "Mission completed for today (UTC)!",
+      isCompleted: isEndDate,
+      newBadges: newlyAwardedBadges
+    });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     console.error("Error completing mission:", errorMessage);

@@ -3,15 +3,16 @@ export interface Mission {
     id: number;
     title: string;
     description?: string;
-    rewardPoints: number;
     type: string;
 }
 
+export type RepeatType = "DAILY" | "WEEKLY" | "MONTHLY" | "CUSTOM";
+
 export interface MissionFormData {
-    missionId: number;
     startDate: string;
     endDate: string;
-    repeatType: "DAILY" | "WEEKLY" | "MONTHLY" | "CUSTOM";
+    durationMonths: number;
+    repeatType: RepeatType;
     repeatDays: boolean[];
 }
 
@@ -43,4 +44,3 @@ export interface CalendarMission {
     repeatType: "DAILY" | "WEEKLY" | "MONTHLY" | "CUSTOM";
     repeatDays: boolean[];
 }
-

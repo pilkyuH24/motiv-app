@@ -1,33 +1,42 @@
+// api/user-missions/[missionId]/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { authenticateUser, extractMissionId, verifyMissionOwnership } from "@/lib/auth-utils";
 
 export async function DELETE(req: Request) {
   try {
-    // Extract `missionId` from the request URL
+    const authResult = await authenticateUser();
+    if (authResult.error) return authResult.error;
+
     const url = new URL(req.url);
-    const missionId = parseInt(url.pathname.split("/").pop() || "");
+    const idResult = extractMissionId(url);
+    if (idResult.error) return idResult.error;
 
-    if (isNaN(missionId)) {
-      return NextResponse.json({ message: "Invalid mission ID" }, { status: 400 });
-    }
+    // Verify mission ownership
+    const ownershipResult = await verifyMissionOwnership(idResult.missionId, authResult.user.id);
+    if (ownershipResult.error) return ownershipResult.error;
 
-    // console.log(`Deleting mission: ${missionId}`);
-
-    // Step 1: Delete all related `UserMissionLog` entries first to avoid foreign key constraint errors
+    // Delete related logs first to prevent errors caused by foreign key constraints
     await prisma.userMissionLog.deleteMany({
-      where: { userMissionId: missionId },
+      where: { userMissionId: idResult.missionId },
     });
 
-    // Step 2: Delete the `UserMission` entry
+    // Delete mission
     await prisma.userMission.delete({
-      where: { id: missionId },
+      where: { id: idResult.missionId },
     });
 
     console.log("Mission deleted successfully.");
-    return NextResponse.json({ message: "Mission deleted successfully." });
+    return NextResponse.json(
+      { message: "Mission deleted successfully." },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error deleting mission:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ message: "Failed to delete mission", error: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to delete mission", error: errorMessage },
+      { status: 500 }
+    );
   }
 }

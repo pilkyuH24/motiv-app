@@ -8,12 +8,10 @@ async function main() {
   // ✅ Delete existing data
   await prisma.userMissionLog.deleteMany();
   await prisma.userMission.deleteMany();
-  await prisma.pointTransaction.deleteMany();
   await prisma.userBadge.deleteMany();
   await prisma.badge.deleteMany();
   await prisma.mission.deleteMany();
-  await prisma.userSetting.deleteMany();
-  await prisma.user.deleteMany();
+  // await prisma.user.deleteMany();
 
   console.log("🌱 Seeding users...");
 
@@ -24,12 +22,6 @@ async function main() {
   });
 
   const user2 = await prisma.user.upsert({
-    where: { email: "user2@test.com" },
-    update: {},
-    create: { email: "user2@test.com", name: "User Two" },
-  });
-
-  const user3 = await prisma.user.upsert({
     where: { email: "hpil331@gmail.com" },
     update: {},
     create: { email: "hpil331@gmail.com", name: "User Three" },
@@ -41,120 +33,119 @@ async function main() {
   const missions = [
     // ===== HEALTH =====
     {
-        title: "🚭 Quit Smoking",
-        description: "Record your success in quitting smoking daily. Stay smoke-free every day.",
-        type: "HEALTH",
+      title: "🚭 Quit Smoking",
+      description: "Record your success in quitting smoking daily. Stay smoke-free every day.",
+      type: "HEALTH",
     },
     {
-        title: "🏋️ Exercise",
-        description: "Exercise for at least 30 minutes a day. Any workout counts, whether cardio or strength training.",
-        type: "HEALTH",
+      title: "🏋️ Exercise",
+      description: "Exercise for at least 30 minutes a day. Any workout counts, whether cardio or strength training.",
+      type: "HEALTH",
     },
     {
-        title: "🌙 Sleep Early",
-        description: "Go to bed before 11 PM and get enough sleep.",
-        type: "HEALTH",
+      title: "🌙 Sleep Early",
+      description: "Go to bed before 11 PM and get enough sleep.",
+      type: "HEALTH",
     },
     {
-        title: "🥗 Eat Healthy",
-        description: "Have a balanced meal every day with vegetables and protein.",
-        type: "HEALTH",
+      title: "🥗 Eat Healthy",
+      description: "Have a balanced meal every day with vegetables and protein.",
+      type: "HEALTH",
     },
 
     // ===== SELF_DEVELOPMENT =====
     {
-        title: "💻 Practice Coding",
-        description: "Solve at least one coding problem a day to improve algorithmic thinking.",
-        type: "SELF_DEVELOPMENT",
+      title: "💻 Practice Coding",
+      description: "Solve at least one coding problem a day to improve algorithmic thinking.",
+      type: "SELF_DEVELOPMENT",
     },
     {
-        title: "📖 Read a Book",
-        description: "Read for at least 30 minutes a day to stimulate intellectual growth.",
-        type: "SELF_DEVELOPMENT",
+      title: "📖 Read a Book",
+      description: "Read for at least 30 minutes a day to stimulate intellectual growth.",
+      type: "SELF_DEVELOPMENT",
     },
     {
-        title: "📝 Write a Journal",
-        description: "Reflect on your day and organize your thoughts and emotions by writing a daily journal.",
-        type: "SELF_DEVELOPMENT",
+      title: "📝 Write a Journal",
+      description: "Reflect on your day and organize your thoughts and emotions by writing a daily journal.",
+      type: "SELF_DEVELOPMENT",
     },
     {
-        title: "📚 Learn a New Skill",
-        description: "Dedicate time to learning something new—language, tool, or topic.",
-        type: "SELF_DEVELOPMENT",
+      title: "📚 Learn a New Skill",
+      description: "Dedicate time to learning something new—language, tool, or topic.",
+      type: "SELF_DEVELOPMENT",
     },
 
     // ===== PRODUCTIVITY =====
     {
-        title: "✅ Plan Your Day",
-        description: "Write a to-do list every morning to stay organized and focused.",
-        type: "PRODUCTIVITY",
+      title: "✅ Plan Your Day",
+      description: "Write a to-do list every morning to stay organized and focused.",
+      type: "PRODUCTIVITY",
     },
     {
-        title: "📂 Clean Your Workspace",
-        description: "Keep your desk and digital workspace clean and distraction-free.",
-        type: "PRODUCTIVITY",
+      title: "📂 Clean Your Workspace",
+      description: "Keep your desk and digital workspace clean and distraction-free.",
+      type: "PRODUCTIVITY",
     },
     {
-        title: "🌐 Contribute to Open Source",
-        description: "Spend 30 minutes to 1 hour contributing to an open-source project or your GitHub repo.",
-        type: "PRODUCTIVITY",
+      title: "🌐 Open Source",
+      description: "Spend 30 minutes to 1 hour contributing to an open-source project or your GitHub repo.",
+      type: "PRODUCTIVITY",
     },
     {
-        title: "📧 Inbox Zero",
-        description: "Clear your inbox by replying or organizing emails daily.",
-        type: "PRODUCTIVITY",
+      title: "📧 Inbox Zero",
+      description: "Clear your inbox by replying or organizing emails daily.",
+      type: "PRODUCTIVITY",
     },
 
     // ===== MINDFULNESS =====
     {
-        title: "🧘 Meditate",
-        description: "Meditate or practice deep breathing for 10 minutes a day to stay calm.",
-        type: "MINDFULNESS",
+      title: "🧘 Meditate",
+      description: "Meditate or practice deep breathing for 10 minutes a day to stay calm.",
+      type: "MINDFULNESS",
     },
     {
-        title: "🌳 Go for a Walk",
-        description: "Take a walk outside and enjoy nature without distractions.",
-        type: "MINDFULNESS",
+      title: "🌳 Go for a Walk",
+      description: "Take a walk outside and enjoy nature without distractions.",
+      type: "MINDFULNESS",
     },
     {
-        title: "🔌 Digital Detox",
-        description: "Avoid screens for at least 1 hour before bed to rest your mind.",
-        type: "MINDFULNESS",
+      title: "🔌 Digital Detox",
+      description: "Avoid screens for at least 1 hour before bed to rest your mind.",
+      type: "MINDFULNESS",
     },
     {
-        title: "🙏 Practice Gratitude",
-        description: "Write down three things you're grateful for today.",
-        type: "MINDFULNESS",
+      title: "🙏 Practice Gratitude",
+      description: "Write down three things you're grateful for today.",
+      type: "MINDFULNESS",
     },
 
     // ===== RELATIONSHIP =====
     {
-        title: "📞 Call a Loved One",
-        description: "Connect with someone close to you through a short call or message.",
-        type: "RELATIONSHIP",
+      title: "📞 Call a Loved One",
+      description: "Connect with someone close to you through a short call or message.",
+      type: "RELATIONSHIP",
     },
     {
-        title: "💬 Compliment Someone",
-        description: "Say something kind or encouraging to someone around you.",
-        type: "RELATIONSHIP",
+      title: "💬 Compliment Someone",
+      description: "Say something kind or encouraging to someone around you.",
+      type: "RELATIONSHIP",
     },
     {
-        title: "💌 Write a Thank-You Note",
-        description: "Express appreciation to someone by writing a short thank-you note or message.",
-        type: "RELATIONSHIP",
+      title: "💌 Write a Thank-You Note",
+      description: "Express appreciation to someone by writing a short thank-you note or message.",
+      type: "RELATIONSHIP",
     },
     {
-        title: "👥 Help a Friend",
-        description: "Support a friend or family member with their task or challenge.",
-        type: "RELATIONSHIP",
+      title: "👥 Help a Friend",
+      description: "Support a friend or family member with their task or challenge.",
+      type: "RELATIONSHIP",
     },
-];
+  ];
 
   await prisma.mission.createMany({
     data: missions.map((m) => ({
       title: m.title,
       description: m.description,
-      rewardPoints: 100,
       type: m.type as MissionType,
     })),
     skipDuplicates: true,
@@ -181,9 +172,9 @@ async function main() {
   const userMissions = [
     { userId: user1.id, missionTitle: "🚭 Quit Smoking", repeatType: "DAILY" },
     { userId: user1.id, missionTitle: "🏋️ Exercise", repeatType: "DAILY" },
-    { userId: user2.id, missionTitle: "🌙 Sleep Early", repeatType: "DAILY" },
     { userId: user2.id, missionTitle: "📖 Read a Book", repeatType: "DAILY" },
-    { userId: user3.id, missionTitle: "📖 Read a Book", repeatType: "DAILY" },
+    { userId: user2.id, missionTitle: "🚭 Quit Smoking", repeatType: "DAILY" },
+    { userId: user2.id, missionTitle: "🏋️ Exercise", repeatType: "DAILY" },
   ];
 
   for (const { userId, missionTitle, repeatType } of userMissions) {
@@ -213,7 +204,7 @@ async function main() {
   for (const userMission of userMissionsData) {
     const repeatDays = userMission.repeatDays as boolean[];
 
-    for (let i = -14; i <= -1; i++) {
+    for (let i = -12; i <= -1; i++) {
       const logDate = new Date(today);
       logDate.setDate(today.getDate() + i);
 
@@ -245,6 +236,68 @@ async function main() {
   }
 
   console.log("✅ Mission logs seeded.");
+
+  const badges = [
+    // 🏆 Rank 1 - God
+    {
+      title: "Consistency God",
+      description: "You completed missions 30 days in a row.",
+      condition: JSON.stringify({ monthly_success_count: ">= 30" }),
+      rank: 1,
+    },
+
+    // 🥇 Rank 2 - Challenge
+    {
+      title: "HEALTH Power",
+      description: "You completed 3 HEALTH missions.",
+      condition: JSON.stringify({ mission_type_HEALTH: ">= 3" }),
+      rank: 2,
+    },
+    {
+      title: "SELF_DEVELOPMENT Power",
+      description: "You completed 3 SELF_DEVELOPMENT missions.",
+      condition: JSON.stringify({ mission_type_SELF_DEVELOPMENT: ">= 3" }),
+      rank: 2,
+    },
+    {
+      title: "Productivity Power",
+      description: "You completed 3 productivity missions.",
+      condition: JSON.stringify({ mission_type_PRODUCTIVITY: ">= 3" }),
+      rank: 2,
+    },
+    {
+      title: "Mission Veteran",
+      description: "You have 5 or more completed missions.",
+      condition: JSON.stringify({ missions_completed: ">= 5" }),
+      rank: 2,
+    },
+
+    // 🥈 Rank 3 - Beginner
+    {
+      title: "First Steps",
+      description: "You completed your first mission!",
+      condition: JSON.stringify({ missions_completed: ">= 1" }),
+      rank: 3,
+    },
+    {
+      title: "Getting Started",
+      description: "You currently have 3 active missions.",
+      condition: JSON.stringify({ missions_ongoing: "== 3" }),
+      rank: 3,
+    },
+  ];
+
+  for (const badge of badges) {
+    await prisma.badge.upsert({
+      where: { title: badge.title },
+      update: {},
+      create: badge,
+    });
+  }
+
+  console.log('✅ Badges seeded successfully!');
+
+
   console.log("🎉 Seeding complete!");
 }
 
