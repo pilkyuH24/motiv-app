@@ -113,7 +113,7 @@ export default function MissionStartForm({
         <input
           type="date"
           value={endDate}
-          // readOnly
+          readOnly
           onChange={(e) => setEndDate(e.target.value)} // For mission complete test
           className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
         />
