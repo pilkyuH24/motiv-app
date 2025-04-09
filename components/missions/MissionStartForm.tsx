@@ -14,7 +14,7 @@ export default function MissionStartForm({
   onSubmit
 }: MissionStartFormProps) {
   const [startDate, setStartDate] = useState(
-    new Date().toISOString().split("T")[0]
+    new Date().toLocaleDateString("sv-SE")
   );
   const [endDate, setEndDate] = useState(
     new Date().toISOString().split("T")[0]
