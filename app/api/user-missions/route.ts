@@ -171,7 +171,7 @@ export async function POST(req: Request) {
       const dayIndex = currentDate.getDay();
       const logDate = new Date(currentDate);
       logDate.setHours(0, 0, 0, 0);
-    
+
       if (repeatType === "DAILY") {
         logs.push({ userMissionId: newMission.id, date: logDate, isDone: false });
         currentDate = addDays(currentDate, 1);
@@ -188,7 +188,7 @@ export async function POST(req: Request) {
         currentDate = addDays(currentDate, 1);
       }
     }
-    
+
 
     if (logs.length > 0) {
       await prisma.userMissionLog.createMany({

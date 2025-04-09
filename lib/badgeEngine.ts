@@ -4,7 +4,7 @@ import { Badge, UserMission, Mission } from "@prisma/client";
 import { subDays } from "date-fns";
 import { aggregateSuccessByDate } from "./badgeEngineHelpers";
 
-// 타입 정의
+// 타입
 type CompletedMission = UserMission & { mission: Mission };
 
 interface BadgeStats {

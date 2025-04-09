@@ -1,7 +1,7 @@
 //components/dashboard/MissionAction.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import BadgeModal from "./BadgeModal";
 
@@ -13,10 +13,18 @@ interface Badge {
   rank?: number;
 }
 
+// Interface for the badge from API response
+interface BadgeResponse {
+  id: number;
+  title: string;
+  description: string | null;
+  rank?: number;
+}
+
 // Interface defining the props required for the MissionActions component
 interface MissionActionsProps {
-  missionId: number; // Unique identifier for the mission
-  logs: { date: string; isDone: boolean }[]; // Array of logs for tracking mission completion
+  missionId: number; 
+  logs: { date: string; isDone: boolean }[]; 
   status: "ONGOING" | "COMPLETED" | "FAILED";
   onMissionUpdate: () => Promise<void>; // Callback function to refresh mission data
 }
@@ -28,7 +36,6 @@ export default function MissionActions({
   status,
   onMissionUpdate,
 }: MissionActionsProps) {
-  // 각 작업에 대한 개별 로딩 상태
   const [completeLoading, setCompleteLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   
@@ -38,7 +45,6 @@ export default function MissionActions({
   // Get today's date in UTC format
   const today = format(new Date(), "yyyy-MM-dd");
 
-  // Find today's log entry and check if the mission is completed
   const todayLog = logs.find(
     (log) =>
       format(parseISO(log.date), "yyyy-MM-dd") === format(today, "yyyy-MM-dd")
@@ -68,7 +74,7 @@ export default function MissionActions({
       // Check if the mission was fully completed and new badges were earned
       if (result.isCompleted && result.newBadges && Array.isArray(result.newBadges) && result.newBadges.length > 0) {
         // Ensure the badges have the correct structure
-        const typedBadges: Badge[] = result.newBadges.map((badge: any) => ({
+        const typedBadges: Badge[] = result.newBadges.map((badge: BadgeResponse) => ({
           id: badge.id,
           title: badge.title,
           description: badge.description,
@@ -78,7 +84,6 @@ export default function MissionActions({
         setEarnedBadges(typedBadges);
         setShowBadgeModal(true);
       } else {
-        // Simple notification for daily completion
         alert("Mission marked as completed for today!");
         await onMissionUpdate(); // Only refresh data when no badges are shown
       }

@@ -7,10 +7,6 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-const scrollToSection = (id: string) => {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-};
-
 export default function Home() {
   const { status } = useSession();
 
