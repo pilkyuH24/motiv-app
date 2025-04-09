@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gradient-to-br from-pink-200 to-blue-200; 
+  @apply bg-gradient-to-br from-sky-200 to-rose-200; 
   /* overflow-hidden; */
   font-family: "Jua", sans-serif; 
 }
@@ -14,6 +14,10 @@ h1, h2, h3, h4, h5, h6 {
 
 p, span, a, button {
   font-family: "Jua", sans-serif;
+}
+
+.font-sour-gummy {
+  font-family: "Sour Gummy", sans-serif;
 }
 
 @keyframes colorAnimation {

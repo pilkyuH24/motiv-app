@@ -4,7 +4,7 @@
   background-color: transparent;
   width: 100%;
   height: 200px;
-  perspective: 1000px; /* Adds depth effect for the 3D flip */
+  perspective: 1000px; 
   font-family: sans-serif;
   font-size: x-large;
 }
@@ -21,8 +21,8 @@
   width: 100%;
   height: 100%;
   text-align: center;
-  transition: transform 0.5s; /* Smooth transition for flip effect */
-  transform-style: preserve-3d; /* Ensures proper 3D rendering */
+  transition: transform 0.5s; 
+  transform-style: preserve-3d; /* Ensures  3D rendering */
 }
 
 /* Flip effect when hovered */
@@ -32,7 +32,7 @@
 
 .flip-card-front,
 .flip-card-back {
-  box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.2); /* Adds a soft shadow */
+  box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.2); 
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -45,23 +45,21 @@
   padding: 3rem;
 }
 
-/* Front side of the card with a semi-transparent effect */
 .flip-card-front {
   background: linear-gradient(#ffffff, #ffffff) padding-box,
               linear-gradient(145deg, transparent 15%,#ffc5dd, #40c9ff) border-box;
   border: 4px solid transparent;
 }
 
-/* Back side of the card with a dynamic gradient animation */
+/* Back side gradient animation */
 .flip-card-back {
   background: linear-gradient(270deg, #ce68d9, #45c6db, #45db79);
   background-size: 400% 400%;
   animation: colorAnimation 5s ease infinite;
   color: white;
-  transform: rotateY(180deg); /* Ensures back side is flipped correctly */
+  transform: rotateY(180deg); 
 }
 
-/* Scrollable container for horizontal card scrolling */
 .overflow-x-auto {
   display: flex;
   flex-wrap: nowrap;
@@ -71,7 +69,6 @@
   padding-bottom: 10px;
 }
 
-/* "Challenge" button styling */
 .challenge-button {
   padding: 0.5em 1em;
   border: none;
@@ -91,7 +88,6 @@
   margin-top: 10px;
 }
 
-/* Hover effect: enlarges the button slightly and changes outline */
 .challenge-button:hover {
   color: #ffffff;
   transform: scale(1.2);
@@ -99,7 +95,6 @@
   box-shadow: 4px 5px 17px -4px #a1342c;
 }
 
-/* Creates a dynamic background effect when hovered */
 .challenge-button::before {
   content: "";
   position: absolute;
@@ -108,12 +103,11 @@
   width: 0;
   height: 100%;
   background-color: #f93030;
-  transform: skewX(45deg); /* Slanted effect for animation */
+  transform: skewX(45deg); 
   z-index: -1;
   transition: width 0.5s ease;
 }
 
-/* Expands background effect when hovered */
 .challenge-button:hover::before {
   width: 250%;
 }

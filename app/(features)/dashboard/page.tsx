@@ -1,11 +1,11 @@
-// app/dashboard/page.tsx
+// Dashboard Page
 "use client";
 
 import { useState } from "react";
 import Calendar from "@/components/calendar/calendar";
 import Loader from "@/components/ui/Loader";
 import Navbar from "@/components/layout/navbar";
-import MissionList from "@/components/missionBoard/MissionList";
+import MissionList from "@/components/dashboard/MissionList";
 import { useUserMissions } from "@/lib/hooks/useUserMissions";
 import { prepareMissionForCalendar, prepareLogsForCalendar } from "@/lib/utils/missionUtils";
 
@@ -36,12 +36,12 @@ export default function Dashboard() {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col xl:flex-row p-6 gap-6 min-h-fit lg:min-h-screen">
-        <div className="w-full xl:flex-2 bg-white/30 backdrop-blur-lg border border-white/40 rounded-lg shadow-lg p-6">
+      <div className="flex flex-col xl:flex-row mt-4 px-4 gap-4 max-h-[calc(100vh-0.5rem)]">
+        <div className="w-full xl:flex-2 h-fit pb-8 mb-4 sm:pb-0 sm:h-[calc(100vh-5rem)] bg-white/20 backdrop-blur-lg border border-white/40 rounded-lg shadow-lg p-6">
           <Calendar logs={calendarLogs} userMissions={calendarMissions} />
         </div>
 
-        <div className="w-full xl:flex-1 bg-white/30 backdrop-blur-lg border border-white/40 rounded-lg shadow-lg p-6 overflow-auto">
+        <div className="w-full xl:flex-1 pb-8 mb-4 bg-white/20 xl:max-h-[calc(100vh-5rem)] backdrop-blur-lg border border-white/40 rounded-lg shadow-lg p-6 overflow-auto">
           <h1 className="text-2xl font-bold mb-4">📋 My Mission Dashboard</h1>
 
           <button
@@ -52,7 +52,7 @@ export default function Dashboard() {
             }`}
             onClick={() => setSelectedMission(null)}
           >
-            🔄 View All Active Missions
+            View All Active Missions
           </button>
 
           <MissionList
@@ -68,7 +68,7 @@ export default function Dashboard() {
             onClick={() => setShowCompleted((prev) => !prev)}
           >
             {showCompleted
-              ? "🙈 Hide Completed Missions"
+              ? "Hide Completed Missions"
               : "✅ View Completed Missions"}
           </button>
 
