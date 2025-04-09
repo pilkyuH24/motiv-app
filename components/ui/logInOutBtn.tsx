@@ -13,6 +13,6 @@ export const LoginButton = () => {
 
 export const LogoutButton = () => {
   return (
-      <button onClick={() => signOut({ callbackUrl: "/" }) } className="bg-gray-500/50 text-base text-white rounded-lg px-5 py-2 shadow transition-colors hover:bg-gray-800/80">Sign Out</button>
+      <button onClick={() => signOut({ callbackUrl: "/" }) } className="bg-indigo-800/60 text-base text-white rounded-lg px-5 py-2 shadow transition-colors hover:bg-indigo-800/90">Sign Out</button>
   );
 };

@@ -13,7 +13,7 @@ datasource db {
 enum Status {
   ONGOING
   COMPLETED
-  FAILED // Need?
+  FAILED // (Need?)
 }
 
 enum MissionRepeatType {
@@ -31,7 +31,6 @@ enum MissionType {
   RELATIONSHIP
 }
 
-
 //
 // =============== Models ===============
 //
@@ -39,14 +38,11 @@ model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String
-  points    Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt 
 
   userMissions      UserMission[]
   badges            UserBadge[]
-  settings          UserSetting?
-  pointTransactions PointTransaction[] // Connects to point change logs
 }
 
 model Mission {
@@ -54,7 +50,6 @@ model Mission {
   title        String
   type         MissionType @default(SELF_DEVELOPMENT)
   description  String?
-  rewardPoints Int      @default(0) // Points awarded upon mission completion
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt 
 
@@ -109,7 +104,8 @@ model Badge {
   id          Int      @id @default(autoincrement())
   title       String   @unique
   description String?
-  condition   String // e.g., "No smoking for one month" (actual logic handled in code)
+  condition   String 
+  rank        Int      @default(3)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt 
 
@@ -126,31 +122,4 @@ model UserBadge {
 
   // Prevent earning the same badge more than once
   @@unique([userId, badgeId])
-}
-
-//
-// =============== User Settings (unchanged) ===============
-//
-model UserSetting {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int      @unique
-  settings  Json     @default("{}") // Stored in JSON format
-  updatedAt DateTime @updatedAt
-}
-
-//
-// =============== Newly Added Point Transaction Table ===============
-//
-model PointTransaction {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  change    Int      // Point amount (+10, -5, etc.)
-  reason    String   // e.g., 'MISSION_COMPLETE', 'BADGE_AWARD', 'ADMIN_ADJUST'
-  createdAt DateTime @default(now())
-  // You can add updatedAt @updatedAt if needed
-
-  // Consider adding index based on query patterns
-  // @@index([userId, createdAt])
 }

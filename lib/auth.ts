@@ -24,7 +24,7 @@ export const authOptions: NextAuthOptions = {
 
       await prisma.user.upsert({
         where: { email: profile.email },
-        create: { email: profile.email, name: profile.name ?? 'USER', points: 0 },
+        create: { email: profile.email, name: profile.name ?? 'USER'},
         update: { name: profile.name },
       });
 
@@ -32,15 +32,6 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session }) {
       if (!session.user?.email) return session;
-
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        include: { badges: true },
-      });
-
-      if (user) {
-        session.user.points = user.points;
-      }
 
       return session;
     },
