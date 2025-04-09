@@ -199,6 +199,8 @@ async function main() {
   console.log("✅ User missions assigned.");
 
   // ✅ Seed mission logs
+  today.setHours(0, 0, 0, 0); // 로컬 자정 기준
+
   const userMissionsData = await prisma.userMission.findMany();
 
   for (const userMission of userMissionsData) {
@@ -207,16 +209,17 @@ async function main() {
     for (let i = -12; i <= -1; i++) {
       const logDate = new Date(today);
       logDate.setDate(today.getDate() + i);
+      logDate.setHours(0, 0, 0, 0); // 로컬 자정 고정
 
       if (
         userMission.repeatType === "CUSTOM" &&
         repeatDays &&
-        !repeatDays[logDate.getUTCDay()]
+        !repeatDays[logDate.getDay()] // ✅ 로컬 요일
       ) {
         continue;
       }
 
-      const isDone = i < 0 ? Math.random() < 0.6 : false;
+      const isDone = Math.random() < 0.6;
 
       await prisma.userMissionLog.upsert({
         where: {
@@ -236,6 +239,7 @@ async function main() {
   }
 
   console.log("✅ Mission logs seeded.");
+
 
   const badges = [
     // 🏆 Rank 1 - God

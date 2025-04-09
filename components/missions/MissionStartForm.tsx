@@ -8,21 +8,25 @@ interface MissionStartFormProps {
   onSubmit: (formData: MissionFormData & { mission: Mission }) => Promise<void>;
 }
 
-export default function MissionStartForm({ 
-  mission, 
+export default function MissionStartForm({
+  mission,
   onClose,
-  onSubmit
+  onSubmit,
 }: MissionStartFormProps) {
-  const [startDate, setStartDate] = useState(
-    new Date().toLocaleDateString("sv-SE")
-  );
-  const [endDate, setEndDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const todayLocalString = new Date().toLocaleDateString("sv-SE");
+  const [startDate, setStartDate] = useState(todayLocalString);
+  const [endDate, setEndDate] = useState(todayLocalString);
+
   const [durationMonths, setDurationMonths] = useState(1);
   const [repeatType, setRepeatType] = useState<RepeatType>("DAILY");
   const [repeatDays, setRepeatDays] = useState<boolean[]>([
-    false, false, false, false, false, false, false
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,7 +35,7 @@ export default function MissionStartForm({
   const calculateEndDate = (start: string, months: number): string => {
     const startDate = new Date(start);
     const end = addMonths(startDate, months);
-    return end.toISOString().split("T")[0];
+    return end.toLocaleDateString("sv-SE");
   };
 
   useEffect(() => {
@@ -60,7 +64,7 @@ export default function MissionStartForm({
         endDate,
         durationMonths,
         repeatType,
-        repeatDays
+        repeatDays,
       });
     } finally {
       setIsSubmitting(false);
@@ -109,7 +113,7 @@ export default function MissionStartForm({
         <input
           type="date"
           value={endDate}
-          // readOnly 
+          // readOnly
           onChange={(e) => setEndDate(e.target.value)} // For mission complete test
           className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
         />
@@ -118,9 +122,7 @@ export default function MissionStartForm({
           {durationMonths > 1 ? "s" : ""} after the start date.
         </p>
 
-        <label className="block mt-4 text-sm font-medium">
-          Repeat Type
-        </label>
+        <label className="block mt-4 text-sm font-medium">Repeat Type</label>
         <div className="flex flex-wrap justify-start gap-1">
           {repeatOptions.map((type) => (
             <button

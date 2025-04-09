@@ -1,8 +1,8 @@
 // app/api/user-missions/complete-today/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { format } from "date-fns";
-import { evaluateAllBadgesForUser } from "@/lib/utils/badgeEngine";
+import { format, startOfToday } from "date-fns";
+import { evaluateAllBadgesForUser } from "@/lib/badgeEngine";
 import { Badge } from "@prisma/client";
 import { authenticateUser, extractMissionId, verifyMissionOwnership } from "@/lib/auth-utils";
 
@@ -26,18 +26,18 @@ export async function POST(req: Request) {
 
     const userMission = ownershipResult.userMission;
 
-    const todayUTC = new Date();
-    todayUTC.setUTCHours(0, 0, 0, 0);
-    const todayFormatted = format(todayUTC, "yyyy-MM-dd");
+    // 오늘 날짜를 로컬 기준으로 계산 (자정 기준)
+    const todayLocal = startOfToday();
+    const todayFormatted = format(todayLocal, "yyyy-MM-dd");
 
     // Create or update mission log for today
     await prisma.userMissionLog.upsert({
-      where: { userMissionId_date: { userMissionId: idResult.missionId, date: todayUTC } },
+      where: { userMissionId_date: { userMissionId: idResult.missionId, date: todayLocal } },
       update: { isDone: true },
-      create: { userMissionId: idResult.missionId, date: todayUTC, isDone: true },
+      create: { userMissionId: idResult.missionId, date: todayLocal, isDone: true },
     });
 
-    // Check if today is the mission's end date
+    // Check if today is the mission's end date (로컬 기준)
     const isEndDate = userMission.endDate 
       ? format(userMission.endDate, "yyyy-MM-dd") === todayFormatted
       : false;
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ 
-      message: "Mission completed for today (UTC)!",
+      message: "Mission completed for today (local time)!",
       isCompleted: isEndDate,
       newBadges: newlyAwardedBadges
     });

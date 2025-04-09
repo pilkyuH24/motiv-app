@@ -168,24 +168,27 @@ export async function POST(req: Request) {
     let currentDate = new Date(start);
 
     while (isBefore(currentDate, end) || currentDate.getTime() === end.getTime()) {
-      const dayIndex = new Date(currentDate).getDay();
-
+      const dayIndex = currentDate.getDay();
+      const logDate = new Date(currentDate);
+      logDate.setHours(0, 0, 0, 0);
+    
       if (repeatType === "DAILY") {
-        logs.push({ userMissionId: newMission.id, date: new Date(currentDate), isDone: false });
+        logs.push({ userMissionId: newMission.id, date: logDate, isDone: false });
         currentDate = addDays(currentDate, 1);
       } else if (repeatType === "WEEKLY") {
-        logs.push({ userMissionId: newMission.id, date: new Date(currentDate), isDone: false });
+        logs.push({ userMissionId: newMission.id, date: logDate, isDone: false });
         currentDate = addWeeks(currentDate, 1);
       } else if (repeatType === "MONTHLY") {
-        logs.push({ userMissionId: newMission.id, date: new Date(currentDate), isDone: false });
+        logs.push({ userMissionId: newMission.id, date: logDate, isDone: false });
         currentDate = addMonths(currentDate, 1);
       } else if (repeatType === "CUSTOM" && repeatDays[dayIndex]) {
-        logs.push({ userMissionId: newMission.id, date: new Date(currentDate), isDone: false });
+        logs.push({ userMissionId: newMission.id, date: logDate, isDone: false });
         currentDate = addDays(currentDate, 1);
       } else {
         currentDate = addDays(currentDate, 1);
       }
     }
+    
 
     if (logs.length > 0) {
       await prisma.userMissionLog.createMany({

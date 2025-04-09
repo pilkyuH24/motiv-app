@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
 import BadgeModal from "./BadgeModal";
 
+// Define badge interface
 interface Badge {
   id: number;
   title: string;
@@ -14,8 +15,8 @@ interface Badge {
 
 // Interface defining the props required for the MissionActions component
 interface MissionActionsProps {
-  missionId: number; 
-  logs: { date: string; isDone: boolean }[]; 
+  missionId: number; // Unique identifier for the mission
+  logs: { date: string; isDone: boolean }[]; // Array of logs for tracking mission completion
   status: "ONGOING" | "COMPLETED" | "FAILED";
   onMissionUpdate: () => Promise<void>; // Callback function to refresh mission data
 }
@@ -27,12 +28,14 @@ export default function MissionActions({
   status,
   onMissionUpdate,
 }: MissionActionsProps) {
+  // 각 작업에 대한 개별 로딩 상태
   const [completeLoading, setCompleteLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   
   const [showBadgeModal, setShowBadgeModal] = useState(false);
   const [earnedBadges, setEarnedBadges] = useState<Badge[]>([]);
 
+  // Get today's date in UTC format
   const today = format(new Date(), "yyyy-MM-dd");
 
   // Find today's log entry and check if the mission is completed
@@ -62,8 +65,9 @@ export default function MissionActions({
 
       const result = await response.json();
       
-      // Check new badges
+      // Check if the mission was fully completed and new badges were earned
       if (result.isCompleted && result.newBadges && Array.isArray(result.newBadges) && result.newBadges.length > 0) {
+        // Ensure the badges have the correct structure
         const typedBadges: Badge[] = result.newBadges.map((badge: any) => ({
           id: badge.id,
           title: badge.title,
@@ -74,6 +78,7 @@ export default function MissionActions({
         setEarnedBadges(typedBadges);
         setShowBadgeModal(true);
       } else {
+        // Simple notification for daily completion
         alert("Mission marked as completed for today!");
         await onMissionUpdate(); // Only refresh data when no badges are shown
       }
@@ -88,7 +93,7 @@ export default function MissionActions({
   // Handler to close the badge modal and refresh data
   const handleBadgeModalClose = async () => {
     setShowBadgeModal(false);
-    // Wait a short time before refreshing until close animation finish
+    // Wait a short time before refreshing to let the modal close animation finish
     setTimeout(async () => {
       await onMissionUpdate();
     }, 300);

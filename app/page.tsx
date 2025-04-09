@@ -7,11 +7,6 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-const sections = [
-  { id: "section1", title: "Select Your Missions" },
-  { id: "section3", title: "Mission Calendar" },
-];
-
 const scrollToSection = (id: string) => {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 };
