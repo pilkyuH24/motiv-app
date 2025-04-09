@@ -65,8 +65,16 @@ export default function MissionList({
           )}
           
           <p className={`text-sm ${type === 'completed' ? 'text-gray-600 mb-1' : ''}`}>
-            📅 {format(parseISO(mission.startDate), "yyyy-MM-dd")} -{" "}
-            {format(parseISO(mission.endDate), "yyyy-MM-dd")}
+            📅 {format(new Date(Date.UTC(
+              parseISO(mission.startDate).getFullYear(),
+              parseISO(mission.startDate).getMonth(),
+              parseISO(mission.startDate).getDate()
+            )), "yyyy-MM-dd")} -{" "}
+            {format(new Date(Date.UTC(
+              parseISO(mission.endDate).getFullYear(),
+              parseISO(mission.endDate).getMonth(),
+              parseISO(mission.endDate).getDate()
+            )), "yyyy-MM-dd")}
             {type === 'active' && <>&nbsp;&nbsp;🔁 {mission.repeatType}</>}
           </p>
           

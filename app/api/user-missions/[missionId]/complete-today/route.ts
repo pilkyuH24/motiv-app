@@ -1,7 +1,7 @@
 // app/api/user-missions/complete-today/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { format, startOfToday } from "date-fns";
+import { format } from "date-fns";
 import { evaluateAllBadgesForUser } from "@/lib/badgeEngine";
 import { Badge } from "@prisma/client";
 import { authenticateUser, extractMissionId, verifyMissionOwnership } from "@/lib/auth-utils";
@@ -26,26 +26,25 @@ export async function POST(req: Request) {
 
     const userMission = ownershipResult.userMission;
 
-    // 오늘 날짜를 로컬 기준으로 계산 (자정 기준)
-    const todayLocal = startOfToday();
-    const todayFormatted = format(todayLocal, "yyyy-MM-dd");
+    // 오늘 날짜를 UTC 기준 자정으로 계산(롤백)
+    const todayUTC = new Date();
+    todayUTC.setUTCHours(0, 0, 0, 0);
+    const todayFormatted = format(todayUTC, "yyyy-MM-dd");
 
-    // Create or update mission log for today
+    // Create or update mission log for today (UTC 기준)
     await prisma.userMissionLog.upsert({
-      where: { userMissionId_date: { userMissionId: idResult.missionId, date: todayLocal } },
+      where: { userMissionId_date: { userMissionId: idResult.missionId, date: todayUTC } },
       update: { isDone: true },
-      create: { userMissionId: idResult.missionId, date: todayLocal, isDone: true },
+      create: { userMissionId: idResult.missionId, date: todayUTC, isDone: true },
     });
 
-    // Check if today is the mission's end date (로컬 기준)
+    // Check if today is the mission's end date (UTC 기준)
     const isEndDate = userMission.endDate 
       ? format(userMission.endDate, "yyyy-MM-dd") === todayFormatted
       : false;
 
-    // Initialize list of newly awarded badges
     let newlyAwardedBadges: { id: number; title: string; description: string | null, rank: number }[] = [];
 
-    // If it's the end date and the mission isn't marked completed, mark it completed and evaluate badges
     if (isEndDate && userMission.status !== "COMPLETED") {
       await prisma.userMission.update({
         where: { id: idResult.missionId },
@@ -53,9 +52,7 @@ export async function POST(req: Request) {
       });
 
       try {
-        // Evaluate badges for the user
         const badgesResult = await evaluateAllBadgesForUser(authResult.user.id);
-        
         if (Array.isArray(badgesResult)) {
           newlyAwardedBadges = badgesResult.map((badge: Badge) => ({
             id: badge.id,
@@ -71,7 +68,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ 
-      message: "Mission completed for today (local time)!",
+      message: "Mission completed for today (UTC)!",
       isCompleted: isEndDate,
       newBadges: newlyAwardedBadges
     });

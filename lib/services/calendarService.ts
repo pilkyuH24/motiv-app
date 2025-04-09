@@ -11,28 +11,32 @@ import { Log, CalendarMission } from "@/types/mission";
 
 export type CalendarLogStatus = "empty" | "future" | "completed" | "partial" | "failed";
 
+const toUTCDate = (date: Date) =>
+  new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+
+const toUTCString = (date: Date) => format(toUTCDate(date), "yyyy-MM-dd");
+
 // Calculate mission log status
 export function calculateLogStatuses(logs: Log[], days: Date[]) {
   const logMap = new Map<string, Log[]>();
 
-  // Optimize lookup with log map creation
   logs.forEach((log: Log) => {
-    const logDateStr = format(parseISO(log.date), "yyyy-MM-dd");
+    const logDateStr = toUTCString(parseISO(log.date)); 
     if (!logMap.has(logDateStr)) logMap.set(logDateStr, []);
     logMap.get(logDateStr)!.push(log);
   });
 
-  // Calculate status for each date
-  const statusMap = new Map<string, { status: CalendarLogStatus, logs: Log[] }>();
+  const statusMap = new Map<string, { status: CalendarLogStatus; logs: Log[] }>();
 
-  days.forEach(day => {
-    const dateStr = format(day, "yyyy-MM-dd");
+  days.forEach((day) => {
+    const dateStr = toUTCString(day); 
     const dayLogs = logMap.get(dateStr) || [];
 
-    const completedCount = dayLogs.filter(log => log.isDone).length;
-    const failedCount = dayLogs.filter(log => !log.isDone).length;
+    const completedCount = dayLogs.filter((log) => log.isDone).length;
+    const failedCount = dayLogs.filter((log) => !log.isDone).length;
     const totalCount = dayLogs.length;
-    const isFutureDay = isFuture(day);
+
+    const isFutureDay = isFuture(toUTCDate(day)); 
 
     let status: CalendarLogStatus = "empty";
 
@@ -54,23 +58,19 @@ export function calculateLogStatuses(logs: Log[], days: Date[]) {
 
 // Generate future mission log data
 export function generateFutureMissionLogs(missions: CalendarMission[]): Log[] {
-  const localMidnight = (date: Date) =>
-    new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const today = toUTCDate(new Date());
 
-  const today = localMidnight(new Date());
-
-  // Iterate through mission data to create future logs
   return missions.flatMap((mission) => {
-    const start = localMidnight(parseISO(mission.startDate));
+    const start = toUTCDate(parseISO(mission.startDate));
     const end = mission.endDate
-      ? localMidnight(parseISO(mission.endDate))
-      : new Date(today.getTime() + 14 * 86400000); // fallback
+      ? toUTCDate(parseISO(mission.endDate))
+      : new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() + 14)); // fallback: 14일 후 UTC
 
     const days = eachDayOfInterval({ start: today, end });
 
     return days
       .filter((day) => {
-        const dayIndex = day.getDay(); // based on local time TEMP
+        const dayIndex = day.getUTCDay(); 
         const daysDifference = Math.floor(
           (day.getTime() - start.getTime()) / 86400000
         );
@@ -81,27 +81,26 @@ export function generateFutureMissionLogs(missions: CalendarMission[]): Log[] {
           (
             (mission.repeatType === "CUSTOM" && mission.repeatDays[dayIndex]) ||
             (mission.repeatType === "WEEKLY" && daysDifference % 7 === 0) ||
-            (mission.repeatType === "MONTHLY" && day.getDate() === start.getDate()) ||
+            (mission.repeatType === "MONTHLY" && day.getUTCDate() === start.getUTCDate()) || // ✅
             mission.repeatType === "DAILY"
           )
         );
       })
       .map((day) => ({
-        date: format(localMidnight(day), "yyyy-MM-dd"),
+        date: toUTCString(day), 
         isDone: false,
         missionTitle: mission.missionTitle,
       }));
   });
 }
 
-// Compare date strings
 export function isSameDay(date1: string, date2: string): boolean {
-  const d1 = new Date(date1);
-  const d2 = new Date(date2);
+  const d1 = toUTCDate(new Date(date1));
+  const d2 = toUTCDate(new Date(date2));
 
   return (
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate()
+    d1.getUTCFullYear() === d2.getUTCFullYear() &&
+    d1.getUTCMonth() === d2.getUTCMonth() &&
+    d1.getUTCDate() === d2.getUTCDate()
   );
 }

@@ -16,7 +16,14 @@ export function prepareMissionForCalendar(mission: UserMission): CalendarMission
 export function prepareLogsForCalendar(missions: UserMission[]): Log[] {
   return missions.flatMap((mission) =>
     mission.logs.map((log) => ({
-      date: format(parseISO(log.date), "yyyy-MM-dd"),
+      date: format(
+        new Date(Date.UTC(
+          parseISO(log.date).getFullYear(),
+          parseISO(log.date).getMonth(),
+          parseISO(log.date).getDate()
+        )),
+        "yyyy-MM-dd"
+      ),
       isDone: log.isDone,
       missionTitle: mission.mission.title,
     }))

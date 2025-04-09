@@ -155,14 +155,14 @@ async function main() {
 
   // ✅ Assign user missions
   const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
+  today.setUTCHours(0, 0, 0, 0); // UTC 자정 고정
 
   const sevenDaysAgo = new Date(today);
-  sevenDaysAgo.setDate(today.getDate() - 14);
+  sevenDaysAgo.setUTCDate(today.getUTCDate() - 14);
 
   const sevenDaysLater = new Date(today);
-  sevenDaysLater.setDate(today.getDate() - 1);
-  sevenDaysLater.setUTCHours(23, 59, 59, 999);
+  sevenDaysLater.setUTCDate(today.getUTCDate() - 1);
+  sevenDaysLater.setUTCHours(23, 59, 59, 999); // UTC 기준 하루 전 끝까지
 
   const missionTitles = missions.map((m) => m.title);
   const missionRecords = await prisma.mission.findMany({
@@ -199,22 +199,22 @@ async function main() {
   console.log("✅ User missions assigned.");
 
   // ✅ Seed mission logs
-  today.setHours(0, 0, 0, 0); // 로컬 자정 기준
+  today.setUTCHours(0, 0, 0, 0); //  UTC 자정 기준
 
   const userMissionsData = await prisma.userMission.findMany();
 
   for (const userMission of userMissionsData) {
     const repeatDays = userMission.repeatDays as boolean[];
 
-    for (let i = -12; i <= -1; i++) {
+    for (let i = -12; i <= 0; i++) {
       const logDate = new Date(today);
-      logDate.setDate(today.getDate() + i);
-      logDate.setHours(0, 0, 0, 0); // 로컬 자정 고정
+      logDate.setUTCDate(today.getUTCDate() + i);
+      logDate.setUTCHours(0, 0, 0, 0); // UTC 자정 기준
 
       if (
         userMission.repeatType === "CUSTOM" &&
         repeatDays &&
-        !repeatDays[logDate.getDay()] // ✅ 로컬 요일
+        !repeatDays[logDate.getUTCDay()] 
       ) {
         continue;
       }

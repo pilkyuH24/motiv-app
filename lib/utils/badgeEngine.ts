@@ -92,7 +92,9 @@ async function getUserStats(userId: number): Promise<BadgeStats> {
   let monthly_success_count = 0;
 
   for (const [dateStr, isDone] of logMap.entries()) {
-    const date = new Date(dateStr);
+    const raw = new Date(dateStr);
+    const date = new Date(Date.UTC(raw.getFullYear(), raw.getMonth(), raw.getDate()));
+  
     if (isDone && date >= sevenDaysAgo) weekly_success_count++;
     if (isDone && date >= thirtyDaysAgo) monthly_success_count++;
   }

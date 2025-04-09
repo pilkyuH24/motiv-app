@@ -13,9 +13,9 @@ export default function MissionStartForm({
   onClose,
   onSubmit,
 }: MissionStartFormProps) {
-  const todayLocalString = new Date().toLocaleDateString("sv-SE");
-  const [startDate, setStartDate] = useState(todayLocalString);
-  const [endDate, setEndDate] = useState(todayLocalString);
+  const todayUTCString = new Date().toISOString().split("T")[0];
+  const [startDate, setStartDate] = useState(todayUTCString);
+  const [endDate, setEndDate] = useState(todayUTCString);
 
   const [durationMonths, setDurationMonths] = useState(1);
   const [repeatType, setRepeatType] = useState<RepeatType>("DAILY");
@@ -35,7 +35,7 @@ export default function MissionStartForm({
   const calculateEndDate = (start: string, months: number): string => {
     const startDate = new Date(start);
     const end = addMonths(startDate, months);
-    return end.toLocaleDateString("sv-SE");
+    return end.toISOString().split("T")[0]; 
   };
 
   useEffect(() => {

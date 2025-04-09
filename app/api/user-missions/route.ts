@@ -43,8 +43,8 @@ export async function GET(request: Request) {
       }
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const todayUTC = new Date();
+    todayUTC.setUTCHours(0, 0, 0, 0);
 
     // Fetch all missions for the user, including mission data and logs
     const userMissions = await prisma.userMission.findMany({
@@ -67,7 +67,7 @@ export async function GET(request: Request) {
       mission =>
         mission.status === "ONGOING" &&
         mission.endDate &&
-        isBefore(new Date(mission.endDate), today)
+        isBefore(new Date(mission.endDate.setUTCHours?.(0, 0, 0, 0) ?? mission.endDate), todayUTC)
     );
 
     // Handle only if there are expired missions
@@ -146,9 +146,10 @@ export async function POST(req: Request) {
     }
 
     const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
+    start.setUTCHours(0, 0, 0, 0);
 
     const end = new Date(endDate);
+    end.setUTCHours?.(0, 0, 0, 0);
 
     // Create user mission
     const newMission = await prisma.userMission.create({
@@ -168,9 +169,9 @@ export async function POST(req: Request) {
     let currentDate = new Date(start);
 
     while (isBefore(currentDate, end) || currentDate.getTime() === end.getTime()) {
-      const dayIndex = currentDate.getDay();
+      const dayIndex = currentDate.getUTCDay();
       const logDate = new Date(currentDate);
-      logDate.setHours(0, 0, 0, 0);
+      logDate.setUTCHours(0, 0, 0, 0);
 
       if (repeatType === "DAILY") {
         logs.push({ userMissionId: newMission.id, date: logDate, isDone: false });

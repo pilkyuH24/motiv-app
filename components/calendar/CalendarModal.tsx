@@ -30,7 +30,13 @@ export default function CalendarModal({
   userMissions,
   onClose,
 }: CalendarModalProps) {
-  const isFutureDate = isFuture(selectedDate);
+  const selectedUTC = new Date(Date.UTC(
+    selectedDate.getFullYear(),
+    selectedDate.getMonth(),
+    selectedDate.getDate()
+  ));
+
+  const isFutureDate = isFuture(selectedUTC);
 
   const futurePredictedMissions =
     modalLogs.length > 0
@@ -39,34 +45,35 @@ export default function CalendarModal({
           .filter((mission) => {
             const start = parseISO(mission.startDate);
             const end = mission.endDate ? parseISO(mission.endDate) : null;
-            const dayIndex = selectedDate.getUTCDay();
+            const dayIndex = selectedUTC.getUTCDay();
             const daysDifference = Math.floor(
-              (selectedDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+              (selectedUTC.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
             );
 
             return (
-              isBefore(start, selectedDate) &&
+              isBefore(start, selectedUTC) &&
               (!end ||
-                isBefore(selectedDate, end) ||
-                isEqual(selectedDate, end)) &&
+                isBefore(selectedUTC, end) ||
+                isEqual(selectedUTC, end)) &&
               ((mission.repeatType === "CUSTOM" &&
                 mission.repeatDays?.[dayIndex]) ||
                 (mission.repeatType === "WEEKLY" && daysDifference % 7 === 0) ||
                 (mission.repeatType === "MONTHLY" &&
-                  selectedDate.getDate() === start.getDate()))
+                  selectedUTC.getUTCDate() === start.getUTCDate()) || 
+                mission.repeatType === "DAILY")
             );
           })
           .map((mission) => ({
             missionTitle: mission.missionTitle,
             isDone: false,
-            date: format(selectedDate, "yyyy-MM-dd"),
+            date: format(selectedUTC, "yyyy-MM-dd"),
           }));
 
   return (
     <div className="fixed inset-0 flex items-center justify-center rounded-lg bg-black/50 z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-72 lg:w-96">
         <h2 className="text-base lg:text-xl font-bold mb-4">
-          {format(selectedDate, "yyyy-MM-dd")} Mission Status
+          {format(selectedUTC, "yyyy-MM-dd")} Mission Status
         </h2>
 
         {futurePredictedMissions.length > 0 ? (

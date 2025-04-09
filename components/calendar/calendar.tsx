@@ -52,7 +52,7 @@ export default function Calendar({ logs, userMissions }: CalendarProps) {
 
         {/* Calendar dates */}
         {calendarData.days.map((day) => {
-          const dateStr = format(day, "yyyy-MM-dd");
+          const dateStr = format(new Date(Date.UTC( day.getFullYear(), day.getMonth(), day.getDate() )), "yyyy-MM-dd");
           const dayData = logStatusMap.get(dateStr) || { status: "empty", logs: [] };
           
           return (

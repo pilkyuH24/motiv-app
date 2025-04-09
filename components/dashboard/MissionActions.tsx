@@ -23,8 +23,8 @@ interface BadgeResponse {
 
 // Interface defining the props required for the MissionActions component
 interface MissionActionsProps {
-  missionId: number; 
-  logs: { date: string; isDone: boolean }[]; 
+  missionId: number;
+  logs: { date: string; isDone: boolean }[];
   status: "ONGOING" | "COMPLETED" | "FAILED";
   onMissionUpdate: () => Promise<void>; // Callback function to refresh mission data
 }
@@ -38,16 +38,17 @@ export default function MissionActions({
 }: MissionActionsProps) {
   const [completeLoading, setCompleteLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  
+
   const [showBadgeModal, setShowBadgeModal] = useState(false);
   const [earnedBadges, setEarnedBadges] = useState<Badge[]>([]);
 
   // Get today's date in UTC format
-  const today = format(new Date(), "yyyy-MM-dd");
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const todayStr = format(today, "yyyy-MM-dd");
 
   const todayLog = logs.find(
-    (log) =>
-      format(parseISO(log.date), "yyyy-MM-dd") === format(today, "yyyy-MM-dd")
+    (log) => format(parseISO(log.date), "yyyy-MM-dd") === todayStr
   );
   const isCompletedToday = todayLog ? todayLog.isDone : false;
 
@@ -70,17 +71,24 @@ export default function MissionActions({
       }
 
       const result = await response.json();
-      
+
       // Check if the mission was fully completed and new badges were earned
-      if (result.isCompleted && result.newBadges && Array.isArray(result.newBadges) && result.newBadges.length > 0) {
+      if (
+        result.isCompleted &&
+        result.newBadges &&
+        Array.isArray(result.newBadges) &&
+        result.newBadges.length > 0
+      ) {
         // Ensure the badges have the correct structure
-        const typedBadges: Badge[] = result.newBadges.map((badge: BadgeResponse) => ({
-          id: badge.id,
-          title: badge.title,
-          description: badge.description,
-          rank: badge.rank
-        }));
-        
+        const typedBadges: Badge[] = result.newBadges.map(
+          (badge: BadgeResponse) => ({
+            id: badge.id,
+            title: badge.title,
+            description: badge.description,
+            rank: badge.rank,
+          })
+        );
+
         setEarnedBadges(typedBadges);
         setShowBadgeModal(true);
       } else {
@@ -147,7 +155,12 @@ export default function MissionActions({
               : "bg-gray-300 text-gray-600 transition-all duration-200 ease-in-out hover:bg-green-500 hover:text-white shadow-inner hover:shadow-[2px_2px_5px_rgba(0,0,0,0.3),_-2px_-2px_5px_rgba(255,255,255,0.5)]"
           }`}
           onClick={handleCompleteToday}
-          disabled={isCompletedToday || status === "COMPLETED" || completeLoading || deleteLoading}
+          disabled={
+            isCompletedToday ||
+            status === "COMPLETED" ||
+            completeLoading ||
+            deleteLoading
+          }
         >
           {isCompletedToday || status === "COMPLETED"
             ? "Completed"
@@ -165,13 +178,10 @@ export default function MissionActions({
           {deleteLoading ? "Deleting..." : "Delete Mission"}
         </button>
       </div>
-      
+
       {/* Badge Earned Modal */}
       {showBadgeModal && (
-        <BadgeModal 
-          badges={earnedBadges} 
-          onClose={handleBadgeModalClose} 
-        />
+        <BadgeModal badges={earnedBadges} onClose={handleBadgeModalClose} />
       )}
     </>
   );

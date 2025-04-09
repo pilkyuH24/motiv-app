@@ -4,7 +4,6 @@ import {
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
-  getDay,
   isFuture,
 } from "date-fns";
 import { Log, CalendarMission } from "@/types/mission";
@@ -14,6 +13,9 @@ import {
   isSameDay,
 } from "@/lib/services/calendarService";
 
+const getUTCDate = (date: Date) =>
+  new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+
 export function useCalendarData(logs: Log[], userMissions: CalendarMission[]) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -22,19 +24,16 @@ export function useCalendarData(logs: Log[], userMissions: CalendarMission[]) {
 
   // Calculate base calendar data
   const calendarData = useMemo(() => {
-    const firstDayOfMonth = startOfMonth(currentDate);
-    const lastDayOfMonth = endOfMonth(currentDate);
+    const first = getUTCDate(startOfMonth(currentDate));
+    const last = getUTCDate(endOfMonth(currentDate));
     
     return {
-      firstDayOfMonth,
-      lastDayOfMonth,
-      days: eachDayOfInterval({
-        start: firstDayOfMonth,
-        end: lastDayOfMonth,
-      }),
+      firstDayOfMonth: first,
+      lastDayOfMonth: last,
+      days: eachDayOfInterval({ start: first, end: last }),
       dayLabels: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
-      paddingStart: getDay(firstDayOfMonth),
-      monthTitle: format(currentDate, "yyyy MMMM"),
+      paddingStart: first.getUTCDay(),
+      monthTitle: format(first, "yyyy MMMM"),
     };
   }, [currentDate]);
 
@@ -46,9 +45,10 @@ export function useCalendarData(logs: Log[], userMissions: CalendarMission[]) {
 
   // Handler for clicking a date
   const handleDateClick = (day: Date) => {
-    const dateStr = format(day, "yyyy-MM-dd");
+    const utcDay = getUTCDate(day); // 보정
+    const dateStr = format(utcDay, "yyyy-MM-dd");
 
-    if (isFuture(day)) {
+    if (isFuture(utcDay)) {
       const futureLogsForDay = futureMissions.filter(log => 
         isSameDay(log.date, dateStr)
       );
@@ -60,7 +60,7 @@ export function useCalendarData(logs: Log[], userMissions: CalendarMission[]) {
       setModalLogs(dayLogs);
     }
 
-    setSelectedDate(day);
+    setSelectedDate(utcDay);
   };
 
   // Handlers to navigate to previous/next month
