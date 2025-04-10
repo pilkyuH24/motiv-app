@@ -1,7 +1,7 @@
-// components/dashboard/MissionList.tsx
+// components/missionBoard/MissionList.tsx
 import { format, parseISO } from "date-fns";
 import { UserMission } from '@/types/mission';
-import MissionActions from "@/components/dashboard/MissionActions";
+import MissionActions from "@/components/ui/MissionActions";
 
 interface MissionListProps {
   missions: UserMission[];
@@ -33,7 +33,7 @@ export default function MissionList({
   }
 
   return (
-    <ul className="space-y-4" style={{ position: 'relative', zIndex: 1 }}>
+    <ul className="space-y-4">
       {missions.map((mission) => (
         <li
           key={mission.id}
@@ -65,16 +65,8 @@ export default function MissionList({
           )}
           
           <p className={`text-sm ${type === 'completed' ? 'text-gray-600 mb-1' : ''}`}>
-            📅 {format(new Date(Date.UTC(
-              parseISO(mission.startDate).getFullYear(),
-              parseISO(mission.startDate).getMonth(),
-              parseISO(mission.startDate).getDate()
-            )), "yyyy-MM-dd")} -{" "}
-            {format(new Date(Date.UTC(
-              parseISO(mission.endDate).getFullYear(),
-              parseISO(mission.endDate).getMonth(),
-              parseISO(mission.endDate).getDate()
-            )), "yyyy-MM-dd")}
+            📅 {format(parseISO(mission.startDate), "yyyy-MM-dd")} -{" "}
+            {format(parseISO(mission.endDate), "yyyy-MM-dd")}
             {type === 'active' && <>&nbsp;&nbsp;🔁 {mission.repeatType}</>}
           </p>
           
