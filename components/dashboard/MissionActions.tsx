@@ -11,6 +11,7 @@ interface MissionActionsProps {
   logs: { date: string; isDone: boolean }[];
   status: "ONGOING" | "COMPLETED" | "FAILED";
   onMissionUpdate: () => void; // Callback function to refresh mission data
+  onOptimisticUpdate?: (type: "complete" | "delete", missionId: number) => void;
 }
 
 // Component handling mission actions such as marking completion and deletion
@@ -19,6 +20,7 @@ export default function MissionActions({
   logs,
   status,
   onMissionUpdate,
+  onOptimisticUpdate,
 }: MissionActionsProps) {
   const [completeLoading, setCompleteLoading] = useState(false); 
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -35,6 +37,9 @@ export default function MissionActions({
   // Handler to mark today's mission as completed
   const handleCompleteToday = async () => {
     if (isCompletedToday) return; 
+ 
+    // Optimistically update
+    onOptimisticUpdate?.("complete", missionId);
 
     setCompleteLoading(true);
     try {
@@ -49,9 +54,10 @@ export default function MissionActions({
         }
       );
 
-      onMissionUpdate();
+      // onMissionUpdate(); // Optimistic change
     } catch (error) {
       console.error(error);
+      onMissionUpdate();
     } finally {
       setCompleteLoading(false);
     }
@@ -63,6 +69,9 @@ export default function MissionActions({
       "Are you sure you want to delete this mission? This action cannot be undone."
     );
     if (!confirmed) return;
+
+    // Optimistic removal
+    onOptimisticUpdate?.("delete", missionId);
 
     setDeleteLoading(true);
     try {
@@ -77,9 +86,10 @@ export default function MissionActions({
         }
       );
 
-      onMissionUpdate();
+      // onMissionUpdate(); // Optimistic change
     } catch (error) {
       console.error(error);
+      onMissionUpdate();
     } finally {
       setDeleteLoading(false);
     }

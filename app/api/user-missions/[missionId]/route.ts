@@ -12,18 +12,20 @@ export async function DELETE(req: Request) {
     const idResult = extractMissionId(url);
     if (idResult.error) return idResult.error;
 
-    // Verify mission ownership
-    const ownershipResult = await verifyMissionOwnership(idResult.missionId, authResult.user.id);
+    const userId = authResult.user.id;
+    const missionId = idResult.missionId;
+
+    const ownershipResult = await verifyMissionOwnership(missionId, userId);
     if (ownershipResult.error) return ownershipResult.error;
 
-    // Delete related logs first to prevent errors caused by foreign key constraints
-    await prisma.userMissionLog.deleteMany({
-      where: { userMissionId: idResult.missionId },
-    });
-
-    // Delete mission
-    await prisma.userMission.delete({
-      where: { id: idResult.missionId },
+    // Transactional delete
+    await prisma.$transaction(async (tx) => {
+      await tx.userMissionLog.deleteMany({
+        where: { userMissionId: missionId },
+      });
+      await tx.userMission.delete({
+        where: { id: missionId },
+      });
     });
 
     console.log("Mission deleted successfully.");
