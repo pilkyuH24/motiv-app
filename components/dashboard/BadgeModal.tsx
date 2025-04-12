@@ -3,18 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-
-interface Badge {
-  id: number;
-  title: string;
-  description: string | null;
-  rank?: number;
-}
-
-interface BadgeModalProps {
-  badges: Badge[];
-  onClose: () => void;
-}
+import { BadgeModalProps } from "@/types/badge-ui";
 
 export default function BadgeModal({ badges, onClose }: BadgeModalProps) {
   const [currentBadgeIndex, setCurrentBadgeIndex] = useState(0);

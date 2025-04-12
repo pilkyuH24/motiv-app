@@ -4,13 +4,15 @@
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { toast } from "react-hot-toast";
+import BadgeModal from "./BadgeModal"; 
+import { Badge } from "@/types/badge";
 
-// Interface defining the props required for the MissionActions component
+
 interface MissionActionsProps {
   missionId: number;
   logs: { date: string; isDone: boolean }[];
   status: "ONGOING" | "COMPLETED" | "FAILED";
-  onMissionUpdate: () => void; // Callback function to refresh mission data
+  onMissionUpdate: () => void;        // Callback function to refresh mission data
   onOptimisticUpdate?: (type: "complete" | "delete", missionId: number) => void;
 }
 
@@ -24,13 +26,14 @@ export default function MissionActions({
 }: MissionActionsProps) {
   const [completeLoading, setCompleteLoading] = useState(false); 
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [earnedBadges, setEarnedBadges] = useState<Badge[]>([]);
 
-  const today = format(new Date(), "yyyy-MM-dd");
+  const today = new Date().toISOString().slice(0, 10); // UTC
 
   // Find today's log entry and check if the mission is completed
   const todayLog = logs.find(
-    (log) =>
-      format(parseISO(log.date), "yyyy-MM-dd") === format(today, "yyyy-MM-dd")
+    (log) => log.date.slice(0, 10) === today
   );
   const isCompletedToday = todayLog ? todayLog.isDone : false;
 
@@ -43,7 +46,7 @@ export default function MissionActions({
 
     setCompleteLoading(true);
     try {
-      await toast.promise(
+      const response = await toast.promise(
         fetch(`/api/user-missions/${missionId}/complete-today`, {
           method: "POST",
         }),
@@ -53,6 +56,14 @@ export default function MissionActions({
           error: "Failed to complete mission.",
         }
       );
+
+      const result = await response.json();
+
+      // If badge earned, show modal
+      if (result.isCompleted && Array.isArray(result.newBadges) && result.newBadges.length > 0) {
+        setEarnedBadges(result.newBadges);
+        setShowBadgeModal(true);
+      }
 
       // onMissionUpdate(); // Optimistic change
     } catch (error) {
@@ -95,33 +106,46 @@ export default function MissionActions({
     }
   };
 
-  return (
-    <div className="mt-2 flex space-x-2">
-      {/* Button to mark today's mission as completed */}
-      <button
-        className={`px-4 py-2 rounded-lg transition ${
-          isCompletedToday || status === "COMPLETED"
-            ? "bg-green-500 text-white cursor-not-allowed shadow-[2px_2px_5px_rgba(0,0,0,0.3),_-2px_-2px_5px_rgba(255,255,255,0.5)]"
-            : "bg-gray-300 text-gray-600 transition-all duration-200 ease-in-out hover:bg-green-500 hover:text-white shadow-inner hover:shadow-[2px_2px_5px_rgba(0,0,0,0.3),_-2px_-2px_5px_rgba(255,255,255,0.5)]"
-        }`}
-        onClick={handleCompleteToday}
-        disabled={isCompletedToday || status === "COMPLETED" || completeLoading}
-      >
-        {isCompletedToday || status === "COMPLETED"
-          ? "Completed"
-          : completeLoading
-          ? "Completing..."
-          : "Complete Today"}
-      </button>
+  const handleBadgeModalClose = async () => {
+    setShowBadgeModal(false);
+    setTimeout(() => {
+      onMissionUpdate();
+    }, 300);
+  };
 
+  return (
+    <>
+      <div className="mt-2 flex space-x-2">
+      {/* Button to mark today's mission as completed */}
+        <button
+          className={`px-4 py-2 rounded-lg transition ${
+            isCompletedToday || status === "COMPLETED"
+              ? "bg-green-500 text-white cursor-not-allowed shadow"
+              : "bg-gray-300 text-gray-600 hover:bg-green-500 hover:text-white"
+          }`}
+          onClick={handleCompleteToday}
+          disabled={isCompletedToday || status === "COMPLETED" || completeLoading}
+        >
+          {isCompletedToday || status === "COMPLETED"
+            ? "Completed"
+            : completeLoading
+            ? "Completing..."
+            : "Complete Today"}
+        </button>
+        
       {/* Button to delete the mission */}
-      <button
-        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow-[2px_2px_5px_rgba(0,0,0,0.3),_-2px_-2px_5px_rgba(255,255,255,0.5)]"
-        onClick={handleDeleteMission}
-        disabled={deleteLoading}
-      >
-        {deleteLoading ? "Deleting..." : "Delete Mission"}
-      </button>
-    </div>
+        <button
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+          onClick={handleDeleteMission}
+          disabled={deleteLoading}
+        >
+          {deleteLoading ? "Deleting..." : "Delete Mission"}
+        </button>
+      </div>
+
+      {showBadgeModal && (
+        <BadgeModal badges={earnedBadges} onClose={handleBadgeModalClose} />
+      )}
+    </>
   );
 }

@@ -5,6 +5,7 @@ import { UserMission, Log, CalendarMission } from "@/types/mission";
 export function prepareMissionForCalendar(mission: UserMission): CalendarMission {
   return {
     id: mission.id,
+    missionId: mission.id,
     missionTitle: mission.mission.title,
     startDate: mission.startDate,
     endDate: mission.endDate,
@@ -25,6 +26,7 @@ export function prepareLogsForCalendar(missions: UserMission[]): Log[] {
         "yyyy-MM-dd"
       ),
       isDone: log.isDone,
+      missionId: mission.id,
       missionTitle: mission.mission.title,
     }))
   );

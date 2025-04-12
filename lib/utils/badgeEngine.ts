@@ -1,28 +1,16 @@
 //lib/badgeEngine.ts
 import { prisma } from "@/lib/prisma";
-import { Badge, UserMission, Mission } from "@prisma/client";
+import { UserMission, Mission } from "@prisma/client";
 import { subDays } from "date-fns";
 import { aggregateSuccessByDate } from "./badgeEngineHelpers";
-
+import { BadgeDB, BadgeStats, BadgeCondition } from "@/types/badge";
 // Type
 type CompletedMission = (UserMission & { mission: Mission });
-
-interface BadgeStats {
-  missions_completed: number;
-  missions_ongoing: number;
-  weekly_success_count: number;
-  monthly_success_count: number;
-  [key: string]: number | boolean;
-}
-
-interface BadgeCondition {
-  [key: string]: boolean | string;
-}
 
 // Badge condition check
 async function evaluateBadgeCondition(
   userId: number,
-  badge: Badge,
+  badge: BadgeDB,
   stats: BadgeStats
 ): Promise<boolean> {
   const condition = JSON.parse(badge.condition) as BadgeCondition;
@@ -124,13 +112,13 @@ function addMissionTypeStats(stats: BadgeStats, completedMissions: CompletedMiss
 // All badge eval
 export async function evaluateAllBadgesForUser(userId: number) {
   const [badges, existingUserBadges] = await Promise.all([
-    prisma.badge.findMany(),
+    prisma.badge.findMany() as Promise<BadgeDB[]>,   // BadgeDB[] 타입으로 추정
     prisma.userBadge.findMany({ where: { userId } }),
   ]);
 
   const ownedBadgeIds = new Set(existingUserBadges.map(b => b.badgeId));
   const stats = await getUserStats(userId);
-  const newlyAwardedBadges: Badge[] = [];
+  const newlyAwardedBadges: BadgeDB[] = [];
 
   for (const badge of badges) {
     if (ownedBadgeIds.has(badge.id)) continue;

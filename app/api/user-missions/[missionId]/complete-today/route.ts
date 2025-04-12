@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { evaluateAllBadgesForUser } from "@/lib/utils/badgeEngine";
-import { Badge } from "@prisma/client";
+import { Badge as UIBadge } from "@/types/badge";
 import { authenticateUser, extractMissionId, verifyMissionOwnership } from "@/lib/auth-utils";
 import { invalidateUserMissionsCache } from "@/lib/cache/serverCache";
 
@@ -44,7 +44,12 @@ export async function POST(req: Request) {
       ? format(userMission.endDate, "yyyy-MM-dd") === todayFormatted
       : false;
 
-    let newlyAwardedBadges: { id: number; title: string; description: string | null, rank: number }[] = [];
+      let newlyAwardedBadges: {
+        id: number;
+        title: string;
+        description: string | null;
+        rank?: number;
+      }[] = [];
 
     if (isEndDate && userMission.status !== "COMPLETED") {
       await prisma.userMission.update({
@@ -55,11 +60,11 @@ export async function POST(req: Request) {
       try {
         const badgesResult = await evaluateAllBadgesForUser(authResult.user.id);
         if (Array.isArray(badgesResult)) {
-          newlyAwardedBadges = badgesResult.map((badge: Badge) => ({
+          newlyAwardedBadges = badgesResult.map((badge): UIBadge => ({
             id: badge.id,
             title: badge.title,
             description: badge.description,
-            rank: badge.rank
+            rank: badge.rank ?? 3
           }));
         }
       } catch (error) {

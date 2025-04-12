@@ -7,7 +7,9 @@ import Navbar from "@/components/layout/navbar";
 import Loader from "@/components/ui/Loader";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Badge, ProfileSectionProps, BadgesListProps } from "@/types/profile";
+import { Badge } from "@/types/badge";
+import { BadgesListProps } from "@/types/badge-ui";
+import { ProfileSectionProps } from "@/types/badge-ui";
 
 // Section component for profile layout
 const ProfileSection = ({ title, children }: ProfileSectionProps) => (

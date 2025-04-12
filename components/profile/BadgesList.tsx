@@ -1,5 +1,5 @@
 // components/profile/BadgesList.tsx
-import { BadgesListProps } from "@/types/profile";
+import { BadgesListProps } from "@/types/badge-ui";
 import { ProfileSection } from "./ProfileSection";
 
 export const BadgesList = ({ badges = [], isLoading = false }: BadgesListProps) => (

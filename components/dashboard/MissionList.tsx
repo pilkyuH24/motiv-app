@@ -51,10 +51,11 @@ export default function MissionList({
           m.id === missionId
             ? {
                 ...m,
+                status: "COMPLETED",
                 logs: [
                   ...m.logs,
                   {
-                    date: new Date().toISOString(), // will get formatted later
+                    date: new Date().toISOString(), 
                     isDone: true,
                   },
                 ],
@@ -67,76 +68,80 @@ export default function MissionList({
 
   return (
     <ul className="space-y-4">
-      {localMissions.map((mission) => (
-        <li
-          key={mission.id}
-          className={`border p-4 rounded-lg shadow 
-            ${
-              type === "active"
-                ? "bg-white/20 backdrop-blur-md"
-                : "bg-white/10 backdrop-blur-md opacity-80"
-            } 
-            cursor-pointer 
-            ${
-              selectedMission === mission.mission.title
-                ? "border-blue-500 bg-blue-100"
-                : ""
-            }`}
-          onClick={() =>
-            onSelectMission(
-              selectedMission === mission.mission.title
-                ? null
-                : mission.mission.title
-            )
-          }
-        >
-          <h2
-            className={`${
-              type === "active" ? "text-xl" : "text-lg"
-            } font-semibold`}
-          >
-            {mission.mission.title}
-          </h2>
+      {localMissions.map((mission) => {
+        const latest = localMissions.find((m) => m.id === mission.id)!;
 
-          {type === "active" && (
-            <p className="text-base ml-2 mr-8 mb-2 text-gray-600">
-              {mission.mission.description || "No description"}
+        return (
+          <li
+            key={mission.id}
+            className={`border p-4 rounded-lg shadow 
+              ${
+                type === "active"
+                  ? "bg-white/20 backdrop-blur-md"
+                  : "bg-white/10 backdrop-blur-md opacity-80"
+              } 
+              cursor-pointer 
+              ${
+                selectedMission === mission.mission.title
+                  ? "border-blue-500 bg-blue-100"
+                  : ""
+              }`}
+            onClick={() =>
+              onSelectMission(
+                selectedMission === mission.mission.title
+                  ? null
+                  : mission.mission.title
+              )
+            }
+          >
+            <h2
+              className={`${
+                type === "active" ? "text-xl" : "text-lg"
+              } font-semibold`}
+            >
+              {mission.mission.title}
+            </h2>
+
+            {type === "active" && (
+              <p className="text-base ml-2 mr-8 mb-2 text-gray-600">
+                {mission.mission.description || "No description"}
+              </p>
+            )}
+
+            <p
+              className={`text-sm ${
+                type === "completed" ? "text-gray-600 mb-1" : ""
+              }`}
+            >
+              📅 {format(parseISO(mission.startDate), "yyyy-MM-dd")} -{" "}
+              {format(parseISO(mission.endDate), "yyyy-MM-dd")}
+              {type === "active" && <>&nbsp;&nbsp;🔁 {mission.repeatType}</>}
             </p>
-          )}
 
-          <p
-            className={`text-sm ${
-              type === "completed" ? "text-gray-600 mb-1" : ""
-            }`}
-          >
-            📅 {format(parseISO(mission.startDate), "yyyy-MM-dd")} -{" "}
-            {format(parseISO(mission.endDate), "yyyy-MM-dd")}
-            {type === "active" && <>&nbsp;&nbsp;🔁 {mission.repeatType}</>}
-          </p>
+            {type === "active" && mission.repeatType === "CUSTOM" && (
+              <p className="text-sm">
+                📅 Repeat Days: {formatRepeatDays(mission.repeatDays)}
+              </p>
+            )}
 
-          {type === "active" && mission.repeatType === "CUSTOM" && (
-            <p className="text-sm">
-              📅 Repeat Days: {formatRepeatDays(mission.repeatDays)}
+            <p
+              className={`text-sm ${
+                type === "active" ? "mb-2" : "text-gray-600"
+              }`}
+            >
+              📌 Status: {mission.status}
             </p>
-          )}
 
-          <p
-            className={`text-sm ${
-              type === "active" ? "mb-2" : "text-gray-600"
-            }`}
-          >
-            📌 Status: {mission.status}
-          </p>
-
-          <MissionActions
-            missionId={mission.id}
-            logs={mission.logs}
-            status={mission.status}
-            onMissionUpdate={onMissionUpdate}
-            onOptimisticUpdate={handleOptimisticUpdate}
-          />
-        </li>
-      ))}
+            <MissionActions
+              missionId={mission.id}
+              logs={latest.logs} 
+              status={mission.status}
+              onMissionUpdate={onMissionUpdate}
+              onOptimisticUpdate={handleOptimisticUpdate}
+            />
+          </li>
+        );
+      })}
     </ul>
   );
 }

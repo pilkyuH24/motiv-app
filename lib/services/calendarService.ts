@@ -82,7 +82,7 @@ export function generateFutureMissionLogs(missions: CalendarMission[]): Log[] {
           (
             (mission.repeatType === "CUSTOM" && mission.repeatDays[dayIndex]) ||
             (mission.repeatType === "WEEKLY" && daysDifference % 7 === 0) ||
-            (mission.repeatType === "MONTHLY" && day.getUTCDate() === start.getUTCDate()) || // ✅
+            (mission.repeatType === "MONTHLY" && day.getUTCDate() === start.getUTCDate()) || 
             mission.repeatType === "DAILY"
           )
         );
@@ -91,6 +91,7 @@ export function generateFutureMissionLogs(missions: CalendarMission[]): Log[] {
         date: toUTCString(day), 
         isDone: false,
         missionTitle: mission.missionTitle,
+        missionId: mission.missionId,
       }));
   });
 }

@@ -1,5 +1,5 @@
 // components/profile/ProfileSection.tsx
-import { ProfileSectionProps } from "@/types/profile";
+import { ProfileSectionProps } from "@/types/badge-ui";
 
 export const ProfileSection = ({ title, children }: ProfileSectionProps) => (
   <div className="p-4 border rounded-lg shadow mb-4 text-xl">
