@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { format, parseISO } from "date-fns";
 import { toast } from "react-hot-toast";
 import BadgeModal from "./BadgeModal"; 
 import { Badge } from "@/types/badge";
