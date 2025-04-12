@@ -17,7 +17,6 @@
     "@prisma/client": "^6.4.1",
     "@reduxjs/toolkit": "^2.6.0",
     "date-fns": "^4.1.0",
-    "framer-motion": "^12.5.0",
     "next": "15.2.1",
     "next-auth": "^4.24.11",
     "prisma": "^6.4.1",
@@ -25,8 +24,7 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "react-intersection-observer": "^9.16.0",
-    "react-redux": "^9.2.0",
-    "zod": "^3.24.2"
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
