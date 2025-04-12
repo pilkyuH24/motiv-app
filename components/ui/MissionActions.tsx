@@ -5,8 +5,8 @@ import { format, parseISO } from "date-fns";
 
 // Interface defining the props required for the MissionActions component
 interface MissionActionsProps {
-  missionId: number; // Unique identifier for the mission
-  logs: { date: string; isDone: boolean }[]; // Array of logs for tracking mission completion
+  missionId: number;
+  logs: { date: string; isDone: boolean }[];
   status: "ONGOING" | "COMPLETED" | "FAILED";
   onMissionUpdate: () => void; // Callback function to refresh mission data
 }
@@ -18,9 +18,8 @@ export default function MissionActions({
   status,
   onMissionUpdate,
 }: MissionActionsProps) {
-  const [loading, setLoading] = useState(false); // State to manage loading during API calls
+  const [loading, setLoading] = useState(false); 
 
-  // Get today's date in UTC format
   const today = format(new Date(), "yyyy-MM-dd");
 
   // Find today's log entry and check if the mission is completed
@@ -32,7 +31,7 @@ export default function MissionActions({
 
   // Handler to mark today's mission as completed
   const handleCompleteToday = async () => {
-    if (isCompletedToday) return; // Prevent duplicate completion
+    if (isCompletedToday) return; 
 
     setLoading(true);
     try {
@@ -60,7 +59,6 @@ export default function MissionActions({
 
   // Handler to delete the mission
   const handleDeleteMission = async () => {
-    // Confirmation dialog before deletion
     if (
       !confirm(
         "Are you sure you want to delete this mission? This action cannot be undone."
@@ -81,7 +79,7 @@ export default function MissionActions({
       }
 
       alert("Mission deleted successfully.");
-      onMissionUpdate(); // Refresh mission data after deletion
+      onMissionUpdate(); 
     } catch (error) {
       console.error(error);
       alert("Failed to delete mission.");

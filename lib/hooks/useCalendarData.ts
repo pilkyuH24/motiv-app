@@ -1,3 +1,4 @@
+//lib/hooks/useCalendarData.ts
 import { useState, useEffect, useMemo } from "react";
 import {
   format,
@@ -45,7 +46,7 @@ export function useCalendarData(logs: Log[], userMissions: CalendarMission[]) {
 
   // Handler for clicking a date
   const handleDateClick = (day: Date) => {
-    const utcDay = getUTCDate(day); // 보정
+    const utcDay = getUTCDate(day); // 
     const dateStr = format(utcDay, "yyyy-MM-dd");
 
     if (isFuture(utcDay)) {

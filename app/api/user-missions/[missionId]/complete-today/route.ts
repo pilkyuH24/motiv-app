@@ -2,9 +2,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
-import { evaluateAllBadgesForUser } from "@/lib/badgeEngine";
+import { evaluateAllBadgesForUser } from "@/lib/utils/badgeEngine";
 import { Badge } from "@prisma/client";
 import { authenticateUser, extractMissionId, verifyMissionOwnership } from "@/lib/auth-utils";
+import { invalidateUserMissionsCache } from "@/lib/cache/serverCache";
 
 export async function POST(req: Request) {
   try {
@@ -66,6 +67,8 @@ export async function POST(req: Request) {
         newlyAwardedBadges = [];
       }
     }
+
+    invalidateUserMissionsCache(authResult.user.id);
 
     return NextResponse.json({ 
       message: "Mission completed for today (UTC)!",

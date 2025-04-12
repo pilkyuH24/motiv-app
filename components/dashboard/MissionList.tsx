@@ -1,7 +1,7 @@
 // components/missionBoard/MissionList.tsx
 import { format, parseISO } from "date-fns";
 import { UserMission } from '@/types/mission';
-import MissionActions from "@/components/ui/MissionActions";
+import MissionActions from "@/components/dashboard/MissionActions";
 
 interface MissionListProps {
   missions: UserMission[];

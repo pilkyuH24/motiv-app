@@ -1,7 +1,8 @@
+//lib/utils/missionCompleteHandler.ts
 import { prisma } from "@/lib/prisma";
 
 /**
- * //Completes a user mission, awards points, and handles related rewards.
+ * //Completes a user mission
  * @param userMissionId ID of the user mission to complete
  */
 export async function missionCompleteHandler(userMissionId: number) {

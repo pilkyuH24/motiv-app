@@ -151,6 +151,28 @@ export async function POST(req: Request) {
     const end = new Date(endDate);
     end.setUTCHours?.(0, 0, 0, 0);
 
+    // Check for duplicate mission (regardless of period)
+    const existing = await prisma.userMission.findFirst({
+      where: {
+        userId: user.id,
+        missionId,
+      },
+    });
+
+    if (existing) {
+      return NextResponse.json(
+        { message: "You already have this mission." },
+        {
+          status: 409, // Conflict
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          },
+        }
+      );
+    }
+
     // Create user mission
     const newMission = await prisma.userMission.create({
       data: {
@@ -190,7 +212,6 @@ export async function POST(req: Request) {
       }
     }
 
-
     if (logs.length > 0) {
       await prisma.userMissionLog.createMany({
         data: logs,
@@ -200,10 +221,6 @@ export async function POST(req: Request) {
     // Invalidate cache
     invalidateUserMissionsCache(user.id);
 
-    // 클라이언트가 이전에 받은 캐시된 데이터를 사용하지 않도록 하기 위한 HTTP 헤더들입니다:
-    // 'Cache-Control': 'no-cache, no-store, must-revalidate' → 캐시를 사용하지 않고 항상 서버에서 새로 받아야 함
-    // 'Pragma': 'no-cache' → HTTP/1.0 호환을 위한 레거시 헤더
-    // 'Expires': '0' → 캐시 만료 시간을 0으로 설정하여 즉시 만료되도록 함
     return NextResponse.json(
       {
         message: "Mission started successfully",

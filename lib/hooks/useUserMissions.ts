@@ -7,13 +7,25 @@ export function useUserMissions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const refreshMissions = async () => {
+  const refreshMissions = async (forceRefresh = true) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/user-missions");
+      // 강제 새로고침 파라미터 추가
+      const url = forceRefresh ? "/api/user-missions?refresh=true" : "/api/user-missions";
+      
+      const response = await fetch(url, {
+        // 캐시 방지 헤더 추가
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      
       if (!response.ok) {
         throw new Error("Failed to fetch missions");
       }
+      
       const data = await response.json();
       setUserMissions(data);
     } catch (error) {
@@ -25,7 +37,8 @@ export function useUserMissions() {
   };
 
   useEffect(() => {
-    refreshMissions();
+    // 초기 로드시에는 캐시된 데이터를 사용해도 됨
+    refreshMissions(false);
   }, []);
 
   return { userMissions, loading, error, refreshMissions };

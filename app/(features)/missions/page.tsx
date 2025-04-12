@@ -8,6 +8,7 @@ import { useMissions } from "@/lib/hooks/useMissions";
 import { Mission, MissionFormData } from "@/types/mission";
 import MissionTypeSection from "@/components/missions/MissionTypeSection";
 import MissionStartForm from "@/components/missions/MissionStartForm";
+import { toast } from "react-hot-toast";
 
 export default function MissionsPage() {
   const { missions, loading } = useMissions();
@@ -50,15 +51,21 @@ export default function MissionsPage() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Mission already exists or fail to be added.");
+      if (response.status === 409) {
+        const data = await response.json();
+        toast.error(data.message || "This mission already exists.");
+        return;
       }
 
-      alert("Mission started successfully!");
+      if (!response.ok) {
+        throw new Error("Unexpected server error");
+      }
+
+      toast.success("Mission started successfully!");
       handleCloseMissionForm();
     } catch (error) {
       console.error(error);
-      alert("Failed to start mission. Please try again.");
+      toast.error("Failed to start mission. Please try again.");
     }
   };
 

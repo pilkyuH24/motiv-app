@@ -42,13 +42,16 @@
   height: 100%;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden; /* Hides the back side when not visible */
-  padding: 3rem;
+}
+.flip-card-back{
+  padding: 2rem;
 }
 
 .flip-card-front {
   background: linear-gradient(#ffffff, #ffffff) padding-box,
               linear-gradient(145deg, transparent 15%,#ffc5dd, #40c9ff) border-box;
   border: 4px solid transparent;
+  padding: 3rem;
 }
 
 /* Back side gradient animation */

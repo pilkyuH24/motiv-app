@@ -17,7 +17,7 @@ export default function MissionCard({ mission, onStartMission }: MissionCardProp
             {mission.description || "No description available"}
           </p>
         </div>
-        <div className="flip-card-back rounded-2xl">
+        <div className="flip-card-back text-2xl rounded-2xl">
           <h2 className="title">{mission.title}</h2>
           <button
             className="challenge-button"

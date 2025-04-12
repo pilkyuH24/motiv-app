@@ -170,7 +170,7 @@ export default function MissionStartForm({
 
         <div className="mt-4 flex justify-end gap-2">
           <button
-            className="px-4 py-2 bg-white text-gray-800 rounded-lg"
+            className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300"
             onClick={onClose}
             disabled={isSubmitting}
           >
