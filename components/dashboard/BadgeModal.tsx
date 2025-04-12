@@ -40,7 +40,6 @@ export default function BadgeModal({ badges, onClose }: BadgeModalProps) {
   }, []);
 
   const handleClose = (e?: React.MouseEvent) => {
-    // If an event is passed, prevent default behavior and stop propagation
     // → e.preventDefault()는 버튼 클릭 시 브라우저의 기본 동작(예: form submit)을 막고,
     //    e.stopPropagation()은 부모 요소로 이벤트가 전파되는 것을 막아줍니다.
     if (e) {
@@ -120,9 +119,7 @@ export default function BadgeModal({ badges, onClose }: BadgeModalProps) {
     }, 5000);
   }
 
-  // Modal content to be rendered
   const modalContent = (
-    // These styles override global styles to ensure full-screen modal
     // createPortal 설명:
     // → createPortal은 React 컴포넌트를 현재 DOM 트리와는 별개의 위치(보통 document.body)에 렌더링할 수 있게 해줍니다.
     //    이 모달처럼 화면 위에 떠야 하는 컴포넌트는 z-index를 포함한 위치 제어가 중요하므로 Portal을 통해 분리 렌더링하는 것이 적절합니다.

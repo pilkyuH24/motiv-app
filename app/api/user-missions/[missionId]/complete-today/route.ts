@@ -12,12 +12,10 @@ export async function POST(req: Request) {
     const authResult = await authenticateUser();
     if (authResult.error) return authResult.error;
 
-    // Extract mission ID from URL
     const url = new URL(req.url);
     const idResult = extractMissionId(url, 'secondLast');
     if (idResult.error) return idResult.error;
 
-    // Verify mission ownership (including mission data)
     const ownershipResult = await verifyMissionOwnership(
       idResult.missionId, 
       authResult.user.id,
@@ -32,14 +30,14 @@ export async function POST(req: Request) {
     todayUTC.setUTCHours(0, 0, 0, 0);
     const todayFormatted = format(todayUTC, "yyyy-MM-dd");
 
-    // Create or update mission log for today (UTC 기준)
+    // Create or update mission log for today (UTC 기준 롤백)
     await prisma.userMissionLog.upsert({
       where: { userMissionId_date: { userMissionId: idResult.missionId, date: todayUTC } },
       update: { isDone: true },
       create: { userMissionId: idResult.missionId, date: todayUTC, isDone: true },
     });
 
-    // Check if today is the mission's end date (UTC 기준)
+    // Check if today is the mission's end date (UTC 기준 롤백)
     const isEndDate = userMission.endDate 
       ? format(userMission.endDate, "yyyy-MM-dd") === todayFormatted
       : false;

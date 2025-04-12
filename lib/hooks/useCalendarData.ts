@@ -23,7 +23,6 @@ export function useCalendarData(logs: Log[], userMissions: CalendarMission[]) {
   const [modalLogs, setModalLogs] = useState<Log[]>([]);
   const [futureMissions, setFutureMissions] = useState<Log[]>([]);
 
-  // Calculate base calendar data
   const calendarData = useMemo(() => {
     const first = getUTCDate(startOfMonth(currentDate));
     const last = getUTCDate(endOfMonth(currentDate));
