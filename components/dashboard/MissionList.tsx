@@ -19,6 +19,7 @@ export default function MissionList({
   onMissionUpdate,
   type,
 }: MissionListProps) {
+  const [localMissions, setLocalMissions] = useState<UserMission[]>(missions);
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
   const formatRepeatDays = (repeatDays?: boolean[]) => {
@@ -36,8 +37,6 @@ export default function MissionList({
       </p>
     );
   }
-
-  const [localMissions, setLocalMissions] = useState<UserMission[]>(missions);
 
   // Optimistic handler
   const handleOptimisticUpdate = (
